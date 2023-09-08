@@ -1,0 +1,16 @@
+#ifndef WIN_EXPORT_H
+#define WIN_EXPORT_H
+
+#ifdef LOG_WATCHER_DLL_BUILD
+#define LOG_WATCHER_API Q_DECL_EXPORT
+#else
+#define LOG_WATCHER_API Q_DECL_IMPORT
+#endif
+
+#ifdef DATA_DLL_BUILD
+#define DATA_API Q_DECL_EXPORT
+#else
+#define DATA_API Q_DECL_IMPORT
+#endif
+
+#endif
