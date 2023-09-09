@@ -249,7 +249,7 @@ Window {
             triggeredOnStart:  false
             repeat: false
             onTriggered: {
-                DataServiceHub.startWatch("C:\\tmp\\log.txt", searchInput.text.trim())
+                DataServiceHub.startWatch("C:\\tmp\\log.txt", searchInput.text)
                 logView.autoScroll = true
             }
         }
