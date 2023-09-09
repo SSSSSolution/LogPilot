@@ -4,6 +4,7 @@ import QtQuick
 import src.modules.data 1.0
 
 Item {
+    id: hub
     property string name: "Singleton"
 
 
@@ -46,16 +47,11 @@ Item {
         id: loadFrontBlockCallback
         LoadFrontBlockCallableObject {
             onSuccessed: {
-//                frontBlockLoading = false
-                if (loadedLogsCount != 0)
-                    DataServiceHub.loadFrontBlock()
-
+                DataServiceHub.loadFrontBlock()
             }
             onFailed: {
-                console.log("load failed")
-//                frontBlockLoading = false
+                console.log("load front stopped");
                 loadedFrontBlockFailed()
-
             }
         }
     }
@@ -64,15 +60,12 @@ Item {
     signal loadedFrontBlockFailed()
 
     function loadFrontBlock() {
-//        if (frontBlockLoading)
-//            return
-
         var cbObj = loadFrontBlockCallback.createObject();
         if (cbObj !== null) {
             loadFrontBlockCbObj = cbObj;
             logWatcherService.loadFrontBlock(loadFrontBlockCbObj)
-//            frontBlockLoading = true;
         } else {
+            console.log("load front stopped due to null obj");
             loadedFrontBlockFailed();
         }
     }

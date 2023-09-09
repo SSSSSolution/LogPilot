@@ -201,7 +201,7 @@ void RealWorker::loadFrontBlock(QObject *sender, LoadBlockCallback callback) {
         }
     }
 
-    m_headLine = m_headLine - blockLogs.size();
+    m_headLine = m_headLine - BlockSize;
     sendBackCallback(sender, callback, blockLogs, true);
 }
 
