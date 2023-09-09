@@ -11,6 +11,25 @@ Window {
     visible: true
     width: 600
 
+    property string filter: ""
+    function replaceFilterText(msg) {
+        if (typeof msg !== 'string'|| msg.trim() === "") {
+            return ""
+        }
+        if (typeof filter !== 'string' || filter.trim() === "") {
+            return msg;
+        }
+
+        var tmpFilter = filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        var regex = new RegExp(tmpFilter, 'gi')
+        var resStr = msg.replace(regex, function(matched){
+            return "<span style='background-color: rgba(210, 180, 70, 0.3);'>" +  matched + "</span>";
+        })
+
+        return resStr
+    }
+
     Image {
         source: "qrc:/images/bg.png"
         anchors.fill: parent
@@ -38,11 +57,19 @@ Window {
         property string scrollDirection: "None"
 
         property bool autoScroll: true
+        onAutoScrollChanged: {
+            console.log("auto scroll changed: " + autoScroll);
+        }
+
 
         onMovingChanged: {
             if (moving) {
-                console.log("pos set to false due to moving");
                 autoScroll = false;
+            } else  {
+                console.log("move -> false ", scrollBar.size + scrollBar.position + " " + scrollBar.active);
+                if ((scrollBar.size + scrollBar.position >= 0.9999999) && (scrollBar.active === false)) {
+                    logView.autoScroll = true;
+                }
             }
         }
 
@@ -73,7 +100,7 @@ Window {
                 if (pressed) {
                     logView.autoScroll = false;
                 } else {
-                    if ((size + position === 1) && (scrollBar.active === false)) {
+                    if ((size + position >= 0.9999999) && (scrollBar.active === false)) {
                         logView.autoScroll = true;
                     }
                 }
@@ -93,20 +120,23 @@ Window {
             width: logView.width - scrollBar.width
             height: text.contentHeight
 
-            Text {
+            TextEdit {
                 id: text
                 anchors.leftMargin: 7
                 anchors.bottomMargin: 2
                 anchors.fill: parent
-                text: model.line + " " + model.msg
+                textFormat: TextEdit.RichText
+                text: "<p style='line-height: 120%;'>" + model.line + " " +
+                      "<font color='" + fontColor + "'>" + replaceFilterText(model.msg) + "</font>" + "</p>"
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
                 wrapMode: Text.WrapAnywhere
+                readOnly: true
 
                 font.family: sharedFont.family
-                font.pixelSize: sharedFont.pixelSize
+                font.pixelSize:16
 
-                color: {
+                property string fontColor: {
                     if (model.level === 0) {
                         return "#FFFFFF"; // Trace
                     } else if (model.level === 1) {
@@ -123,6 +153,8 @@ Window {
                         return "#FFFFFF" // Normal
                     }
                 }
+
+                color: "grey"
             }
 
             TextMetrics {
@@ -134,8 +166,8 @@ Window {
 
         QtObject {
             id: sharedFont
-            property string family: "Consolas"
-            property int pixelSize: 15
+            property string family: "DejaVu Sans Mono"
+            property int pixelSize: 16
         }
     }
 
@@ -149,7 +181,7 @@ Window {
             height: 30
 
             Rectangle {
-                color: "white"
+                color: "transparent"
                 anchors.fill: parent
                 Text {
                     anchors.fill: parent
@@ -200,8 +232,18 @@ Window {
 
                 color: "black"
 
-                onTextChanged: {
+                property string lastFilter: ""
 
+                onTextChanged: {
+                    if (text === "") {
+                        if (text === lastFilter) {
+                            return;
+                        }
+                        lastFilter = text;
+
+                        DataServiceHub.stopWatch();
+                        restartTimer.start(0)
+                    }
                 }
 
                 MouseArea {
@@ -212,11 +254,21 @@ Window {
                     enabled: false
                 }
 
+                Keys.onReturnPressed: {
+                    console.log("Return key pressed! Input text is:", text)
+                    if (text === lastFilter) {
+                        return;
+                    }
+                    lastFilter = text;
+
+                    DataServiceHub.stopWatch();
+                    restartTimer.start(0)
+                }
+
                 Connections {
                     target: mouseArea
 
                     function onClicked(mouse) {
-                        console.log("Outer MouseArea clicked!")
                         mouse.accepted = false;
                     }
                 }
@@ -236,20 +288,27 @@ Window {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
+                    if (searchInput.text === searchInput.lastFilter) {
+                        return;
+                    }
+                    searchInput.lastFilter = searchInput.text;
+
                     DataServiceHub.stopWatch();
-                    restartTimer.start()
+                    restartTimer.start(0)
                 }
             }
         }
 
         Timer {
             id: restartTimer
-            interval: 100
+            interval: 0
             running: false
             triggeredOnStart:  false
             repeat: false
+
             onTriggered: {
-                DataServiceHub.startWatch("C:\\tmp\\log.txt", searchInput.text)
+                filter = searchInput.lastFilter
+                DataServiceHub.startWatch("C:\\tmp\\log.txt", filter)
                 logView.autoScroll = true
             }
         }

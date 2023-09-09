@@ -111,7 +111,7 @@ void RealWorker::startWork() {
             auto logItem = std::make_shared<LogItem>();
             logItem->line = i;
 
-            logItem->msg = m_curFile.readLine();
+            logItem->msg = m_curFile.readLine().trimmed();
             if (m_filter.isEmpty() || logItem->msg.contains(m_filter, Qt::CaseInsensitive)) {
                 blockLogs.push_back(logItem);
             }
@@ -141,7 +141,7 @@ void RealWorker::startWork() {
                 QByteArray line = m_curFile.readLine();
 
                 auto log = std::make_shared<LogItem>();
-                log->msg = line;
+                log->msg = line.trimmed();
                 log->line = m_tailLine + 1;
                 if (m_filter.isEmpty() || log->msg.contains(m_filter, Qt::CaseInsensitive)) {
                     newLogs.push_back(log);
@@ -195,7 +195,7 @@ void RealWorker::loadFrontBlock(QObject *sender, LoadBlockCallback callback) {
     for (int i = startLine; i <= m_headLine; i++) {
         auto log = std::make_shared<LogItem>();
         log->line = i;
-        log->msg = m_curFile.readLine();
+        log->msg = m_curFile.readLine().trimmed();
         if (m_filter.isEmpty() || log->msg.contains(m_filter, Qt::CaseInsensitive)) {
             blockLogs.push_back(log);
         }
