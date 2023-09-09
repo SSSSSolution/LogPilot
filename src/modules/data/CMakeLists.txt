@@ -46,3 +46,9 @@ install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
+# install qml module
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}plugin.dll
+    ${CMAKE_CURRENT_BINARY_DIR}/qmldir
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/qml/src/modules/${PROJECT_NAME}
+)
