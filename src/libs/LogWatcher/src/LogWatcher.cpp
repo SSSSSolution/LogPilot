@@ -90,7 +90,7 @@ void RealWorker::startWork() {
     QVector<std::shared_ptr<LogItem>> blockLogs;
 
     m_curFile.setFileName(m_filePath);
-    if (!m_curFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if (!m_curFile.open(QIODevice::ReadOnly)) {
         QString errStr = "Failed to open file: " + m_filePath;
         sendBackCallback(m_startLoadCallbackSender, m_startLoadCallback, blockLogs, false, errStr);
         return;
@@ -107,9 +107,10 @@ void RealWorker::startWork() {
 
         int startPos = m_linePosMap[startLine];
         m_curFile.seek(startPos);
-        for (int i = startLine; i < m_tailLine; i++) {
+        for (int i = startLine; i <= m_tailLine; i++) {
             auto logItem = std::make_shared<LogItem>();
             logItem->line = i;
+
             logItem->msg = m_curFile.readLine();
             if (m_filter.isEmpty() || logItem->msg.contains(m_filter, Qt::CaseInsensitive)) {
                 blockLogs.push_back(logItem);
@@ -124,21 +125,30 @@ void RealWorker::startWork() {
     connect(m_pollTimer, &QTimer::timeout, this, [=]() {
         if (m_curFile.isOpen()) {
             QVector<std::shared_ptr<LogItem>> newLogs;
-            int startPos = m_linePosMap[m_tailLine];
+            int startPos = m_linePosMap[m_tailLine + 1];
             m_curFile.seek(startPos);
 
-            while (!m_curFile.atEnd()) {
+            if (m_curFile.atEnd())
+                return;
+
+            while (true) {
+                QByteArray all = m_curFile.readAll();
+                if (all.isEmpty() || !all.contains('\n'))
+                    break;
+
+                startPos = m_linePosMap[m_tailLine + 1];
+                m_curFile.seek(startPos);
                 QByteArray line = m_curFile.readLine();
-                if (line.endsWith('\n')) {
-                    auto log = std::make_shared<LogItem>();
-                    log->line = m_tailLine;
-                    log->msg = line.trimmed();
-                    if (m_filter.isEmpty() || log->msg.contains(m_filter, Qt::CaseInsensitive)) {
-                        newLogs.push_back(log);
-                    }
-                    m_linePosMap[m_tailLine + 1] = m_linePosMap[m_tailLine] + line.size();
-                    m_tailLine++;
+
+                auto log = std::make_shared<LogItem>();
+                log->msg = line;
+                log->line = m_tailLine + 1;
+                if (m_filter.isEmpty() || log->msg.contains(m_filter, Qt::CaseInsensitive)) {
+                    newLogs.push_back(log);
                 }
+                m_tailLine++;
+                m_linePosMap[m_tailLine + 1] = m_linePosMap[m_tailLine] + line.size();
+
             }
             if (newLogs.size() > 0) {
                 emit newTailLogs(newLogs);
