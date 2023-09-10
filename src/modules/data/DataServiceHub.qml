@@ -40,7 +40,7 @@ Item {
         }
         filter = text;
         DataServiceHub.stopWatch();
-        restartTimer.start(0)
+        restartTimer.start()
     }
 
     Timer {
