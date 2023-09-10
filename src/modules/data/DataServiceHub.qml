@@ -28,7 +28,7 @@ Item {
 
         logLevel = level;
         stopWatch();
-        restartTimer.start(0);
+        restartTimer.start();
     }
 
     // filter
