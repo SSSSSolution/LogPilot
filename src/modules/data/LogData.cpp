@@ -43,14 +43,7 @@ void LogData::append(QVector<std::shared_ptr<LogItem>> logs) {
     int last = m_logs.size() + logs.size() - 1;
     if (last >= start) {
         beginInsertRows(QModelIndex(), start, last);
-        for (auto log : logs) {
-            for (auto &it : m_logLevelRegexMap) {
-                QRegularExpressionMatch match = it.second.match(log->msg);
-                if (match.hasMatch()) {
-                    log->level = static_cast<LogItem::LogLevel>(it.first);
-                    break;
-                }
-            }
+        for (auto &log : logs) {
             m_logs.enqueue(log);
         }
         endInsertRows();
@@ -63,24 +56,9 @@ void LogData::prepend(QVector<std::shared_ptr<LogItem>> logs) {
     if (last >= start) {
         beginInsertRows(QModelIndex(), 0, 0 + logs.size() - 1);
         for (int i = logs.size() - 1; i >= 0; i--) {
-            for (auto &it : m_logLevelRegexMap) {
-                QRegularExpressionMatch match = it.second.match(logs[i]->msg);
-                if (match.hasMatch()) {
-                    logs[i]->level = static_cast<LogItem::LogLevel>(it.first);
-                    break;
-                }
-            }
             m_logs.prepend(logs[i]);
         }
         endInsertRows();
-    }
-}
-
-void LogData::setLogLevelRegex(QVector<QString> regexs) {
-    m_logLevelRegexMap.clear();
-    for (int i = 0; i < regexs.size(); i++) {
-        QRegularExpression re(regexs[i], QRegularExpression::CaseInsensitiveOption);
-        m_logLevelRegexMap[i] = re;
     }
 }
 
@@ -93,14 +71,3 @@ void LogData::clear() {
         endRemoveRows();
     }
 }
-
-//void LogData::onNewLogs(QVector<QByteArray> logs) {
-//    QVector<std::shared_ptr<LogMsg>> msgs;
-//    for (auto log : logs) {
-//        auto msg = std::make_shared<LogMsg>();
-//        msg->msg = QString::fromUtf8(log);
-//        msgs.append(msg);
-//        qDebug() << "recv msg: " << msg->msg;
-//    }
-//    append(msgs);
-//}

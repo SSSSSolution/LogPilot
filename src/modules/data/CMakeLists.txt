@@ -16,8 +16,6 @@ set(CPP_FILES
     LogData.cpp
     LogWatcherService.h
     LogWatcherService.cpp
-    LogModelSortFilterProxyModel.h
-    LogModelSortFilterProxyModel.cpp
     FpsItem.h
     FpsItem.cpp
 )

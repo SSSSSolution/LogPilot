@@ -34,19 +34,11 @@ public:
 
     void prepend(QVector<std::shared_ptr<LogItem>> logs);
 
-    void setLogLevelRegex(QVector<QString> regexs);
-
     void clear();
-
-//    void setFilter(const QString &)
-private:
-//    void onNewLogs(QVector<QByteArray> logs);
 
 private:
     QQueue<std::shared_ptr<LogItem>> m_logs;
     LogWatcher *m_logWatcher;
-
-    std::map<int, QRegularExpression> m_logLevelRegexMap;
 };
 
 #endif // LOG_DATA_H

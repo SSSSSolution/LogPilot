@@ -27,7 +27,8 @@ LogWatcher::~LogWatcher()
     stopWatch();
 }
 
-void LogWatcher::startWatch(const QString &path, LoadBlockCallback callback, const QString &filter) {
+void LogWatcher::startWatch(const QString &path, LoadBlockCallback callback, const QString &filter,
+                            LogItem::LogLevel level, const std::map<LogItem::LogLevel, QString> &logLevelRegexs) {
     m_filePath = path;
     connect(m_worker.get(), &RealWorker::newTailLogs,
             this, &LogWatcher::newTailLogs, Qt::QueuedConnection);
@@ -36,6 +37,7 @@ void LogWatcher::startWatch(const QString &path, LoadBlockCallback callback, con
 
     m_worker->setFilePath(path);
     m_worker->setFilter(filter);
+    m_worker->setLogLevel(level, logLevelRegexs);
     m_worker->setStartCallback(this, callback);
     m_workerThread.start();
 }
@@ -67,6 +69,15 @@ void RealWorker::setFilePath(const QString &path) {
 
 void RealWorker::setFilter(const QString &filter) {
     m_filter = filter;
+}
+
+void RealWorker::setLogLevel(LogItem::LogLevel level, const std::map<LogItem::LogLevel, QString> &logLevelRegexs) {
+    m_level = level;
+    m_logLevelRegexs.clear();
+    for (auto it : logLevelRegexs) {
+        QRegularExpression re(it.second, QRegularExpression::CaseInsensitiveOption);
+        m_logLevelRegexs[it.first] = re;
+    }
 }
 
 void RealWorker::setStartCallback(QObject *sender, LoadBlockCallback callback) {
@@ -108,12 +119,30 @@ void RealWorker::startWork() {
         int startPos = m_linePosMap[startLine];
         m_curFile.seek(startPos);
         for (int i = startLine; i <= m_tailLine; i++) {
-            auto logItem = std::make_shared<LogItem>();
-            logItem->line = i;
+            auto log = std::make_shared<LogItem>();
+            log->line = i;
+            log->msg = m_curFile.readLine().trimmed();
 
-            logItem->msg = m_curFile.readLine().trimmed();
-            if (m_filter.isEmpty() || logItem->msg.contains(m_filter, Qt::CaseInsensitive)) {
-                blockLogs.push_back(logItem);
+            // process log level
+            bool found = false;
+            for (auto &it : m_logLevelRegexs) {
+                QRegularExpressionMatch match = it.second.match(log->msg);
+                if (match.hasMatch()) {
+                    log->level = static_cast<LogItem::LogLevel>(it.first);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                log->level = LogItem::LogLevel::None;
+            }
+            if (log->level < m_level) {
+                continue;
+            }
+
+            // process filter
+            if (m_filter.isEmpty() || log->msg.contains(m_filter, Qt::CaseInsensitive)) {
+                blockLogs.push_back(log);
             }
         }
     }
@@ -143,6 +172,25 @@ void RealWorker::startWork() {
                 auto log = std::make_shared<LogItem>();
                 log->msg = line.trimmed();
                 log->line = m_tailLine + 1;
+
+                // process log level
+                bool found = false;
+                for (auto &it : m_logLevelRegexs) {
+                    QRegularExpressionMatch match = it.second.match(log->msg);
+                    if (match.hasMatch()) {
+                        log->level = static_cast<LogItem::LogLevel>(it.first);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    log->level = LogItem::LogLevel::None;
+                }
+                if (log->level < m_level) {
+                    continue;
+                }
+
+                // process filter
                 if (m_filter.isEmpty() || log->msg.contains(m_filter, Qt::CaseInsensitive)) {
                     newLogs.push_back(log);
                 }
@@ -196,6 +244,25 @@ void RealWorker::loadFrontBlock(QObject *sender, LoadBlockCallback callback) {
         auto log = std::make_shared<LogItem>();
         log->line = i;
         log->msg = m_curFile.readLine().trimmed();
+
+        // process log level
+        bool found = false;
+        for (auto &it : m_logLevelRegexs) {
+            QRegularExpressionMatch match = it.second.match(log->msg);
+            if (match.hasMatch()) {
+                log->level = static_cast<LogItem::LogLevel>(it.first);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            log->level = LogItem::LogLevel::None;
+        }
+        if (log->level < m_level) {
+            continue;
+        }
+
+        // process filter
         if (m_filter.isEmpty() || log->msg.contains(m_filter, Qt::CaseInsensitive)) {
             blockLogs.push_back(log);
         }

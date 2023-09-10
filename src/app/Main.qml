@@ -11,19 +11,15 @@ Window {
     visible: true
     width: 600
 
-    property string filter: ""
     function replaceFilterText(msg) {
         if (typeof msg !== 'string'|| msg.trim() === "") {
             return ""
         }
-        if (typeof filter !== 'string' || filter.trim() === "") {
+        if (DataServiceHub.filter.trim() === "") {
             return msg;
         }
 
-        var tmpFilter = filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-        var regex = new RegExp(tmpFilter, 'gi')
-        var resStr = msg.replace(regex, function(matched){
+        var resStr = msg.replace(DataServiceHub.filterRegExp, function(matched){
             return "<span style='background-color: rgba(210, 180, 70, 0.3);'>" +  matched + "</span>";
         })
 
@@ -56,19 +52,15 @@ Window {
         property real lastContentY: 0
         property string scrollDirection: "None"
 
-        property bool autoScroll: true
-        onAutoScrollChanged: {
-            console.log("auto scroll changed: " + autoScroll);
-        }
 
 
         onMovingChanged: {
             if (moving) {
-                autoScroll = false;
+                DataServiceHub.setAutoScroll(false);
             } else  {
                 console.log("move -> false ", scrollBar.size + scrollBar.position + " " + scrollBar.active);
                 if ((scrollBar.size + scrollBar.position >= 0.9999999) && (scrollBar.active === false)) {
-                    logView.autoScroll = true;
+                    DataServiceHub.setAutoScroll(true);
                 }
             }
         }
@@ -81,8 +73,7 @@ Window {
             triggeredOnStart: true
             repeat: true
             onTriggered: {
-                if (logView.autoScroll) {
-//                    logView.contentY = logView.contentHeight - logView.height
+                if (DataServiceHub.autoScroll) {
                     logView.positionViewAtEnd();
                 }
             }
@@ -98,17 +89,17 @@ Window {
 
             onPressedChanged: {
                 if (pressed) {
-                    logView.autoScroll = false;
+                    DataServiceHub.setAutoScroll(false);
                 } else {
                     if ((size + position >= 0.9999999) && (scrollBar.active === false)) {
-                        logView.autoScroll = true;
+                        DataServiceHub.setAutoScroll(true);
                     }
                 }
             }
 
             onPositionChanged: {
                 if ((size + position === 1) && (scrollBar.active === false)) {
-                    logView.autoScroll = true;
+                    DataServiceHub.setAutoScroll(true);
                 }
             }
         }
@@ -116,6 +107,7 @@ Window {
         delegate: Rectangle {
             id: delegateRoot
             color: "transparent"
+            clip: true
 
             width: logView.width - scrollBar.width
             height: text.contentHeight
@@ -193,12 +185,6 @@ Window {
             }
         }
 
-    Component.onCompleted: {
-        console.log("start wathch: " + "C:\\tmp\\log.txt");
-        DataServiceHub.startWatch("C:\\tmp\\log.txt", "")
-    }
-
-
     property int oldContentY: 0
     Connections {
         target: DataServiceHub
@@ -214,6 +200,32 @@ Window {
         }
 
         height: 50
+
+        TextInput {
+            id: levelInput
+            anchors {
+                top: parent.top
+                bottom: parent.bottom
+                left: parent.left
+                margins: 20
+            }
+            width: 80
+            color: "white"
+
+            onTextChanged: {
+                if (text.trim() === "") {
+                    DataServiceHub.setLogLevel(-1);
+                    return;
+                }
+
+                var level = parseInt(text);
+                if (isNaN(level)) {
+                    console.log("The string is not a valid number");
+                } else {
+                    DataServiceHub.setLogLevel(level);
+                }
+            }
+        }
 
         Rectangle {
             id: searchBound
@@ -236,13 +248,7 @@ Window {
 
                 onTextChanged: {
                     if (text === "") {
-                        if (text === lastFilter) {
-                            return;
-                        }
-                        lastFilter = text;
-
-                        DataServiceHub.stopWatch();
-                        restartTimer.start(0)
+                        DataServiceHub.setFilter(text);
                     }
                 }
 
@@ -255,14 +261,7 @@ Window {
                 }
 
                 Keys.onReturnPressed: {
-                    console.log("Return key pressed! Input text is:", text)
-                    if (text === lastFilter) {
-                        return;
-                    }
-                    lastFilter = text;
-
-                    DataServiceHub.stopWatch();
-                    restartTimer.start(0)
+                    DataServiceHub.setFilter(text);
                 }
 
                 Connections {
@@ -288,28 +287,8 @@ Window {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    if (searchInput.text === searchInput.lastFilter) {
-                        return;
-                    }
-                    searchInput.lastFilter = searchInput.text;
-
-                    DataServiceHub.stopWatch();
-                    restartTimer.start(0)
+                    DataServiceHub.setFilter(searchInput.text);
                 }
-            }
-        }
-
-        Timer {
-            id: restartTimer
-            interval: 0
-            running: false
-            triggeredOnStart:  false
-            repeat: false
-
-            onTriggered: {
-                filter = searchInput.lastFilter
-                DataServiceHub.startWatch("C:\\tmp\\log.txt", filter)
-                logView.autoScroll = true
             }
         }
     }

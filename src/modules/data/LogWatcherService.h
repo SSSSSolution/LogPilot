@@ -4,7 +4,6 @@
 #include <memory>
 #include <QObject>
 #include <QQmlEngine>
-#include <QSortFilterProxyModel>
 #include <LogWatcher/LogWatcher.h>
 #include <LogData.h>
 #include <WinExport.h>
@@ -60,23 +59,18 @@ public:
     LogWatcherService();
     ~LogWatcherService() = default;
 
-    Q_INVOKABLE void startWork(QString path, StartCallableObject *cbObj = nullptr, const QString &filter = "");
+    Q_INVOKABLE void startWork(QString path, StartCallableObject *cbObj, const QString &filter,
+                               LogItem::LogLevel logLevel, const QVariantMap &logLevelRegexs);
 
     Q_INVOKABLE void stopWork();
 
     Q_INVOKABLE void loadFrontBlock(LoadFrontBlockCallableObject *cbObj = nullptr);
-
-    Q_INVOKABLE void setFilter(const QString &regex);
-
-    Q_INVOKABLE void unsetFilter();
 
     Q_INVOKABLE void onCurLineChanged(int curLine);
 
     Q_INVOKABLE void onPageItemCountChanged(int pageItemCount);
 
     Q_INVOKABLE QAbstractItemModel *logData();
-
-    Q_INVOKABLE void setLogLevelRegex(QVector<QString> regexs);
 
 signals:
     void watchStarted();
@@ -91,9 +85,7 @@ private:
 
     std::unique_ptr<LogWatcher> m_logWatcher;
     std::unique_ptr<LogData> m_logData;
-    QSortFilterProxyModel *m_filterProxyModel;
     QAbstractItemModel *m_curModel;
-
 
     int m_curLine;
 };

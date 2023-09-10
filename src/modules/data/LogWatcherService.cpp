@@ -1,16 +1,12 @@
 #include "LogWatcherService.h"
 #include <QElapsedTimer>
 #include <QRegExp>
+#include <QVariantMap>
 #include <iostream>
 
 LogWatcherService::LogWatcherService() {
     m_logWatcher = std::make_unique<LogWatcher>();
     m_logData = std::make_unique<LogData>(m_logWatcher.get());
-    m_filterProxyModel = new QSortFilterProxyModel();
-    m_filterProxyModel->setSourceModel(m_logData.get());
-    m_filterProxyModel->setFilterRole(LogData::SearchRole);
-    m_filterProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    m_filterProxyModel->setFilterKeyColumn(0);
 
     m_curModel = m_logData.get();
 
@@ -19,10 +15,21 @@ LogWatcherService::LogWatcherService() {
     });
 }
 
-void LogWatcherService::startWork(QString path, StartCallableObject *cbObj, const QString &filter) {
+void LogWatcherService::startWork(QString path, StartCallableObject *cbObj, const QString &filter,
+                                  LogItem::LogLevel logLevel, const QVariantMap &logLevelRegexs) {
     qDebug() << "log watcher service: START at " << path;
 
     m_logData->clear();
+
+    std::map<LogItem::LogLevel, QString> regexsMap;
+    regexsMap[LogItem::LogLevel::Trace] =  logLevelRegexs["trace"].toString();
+    regexsMap[LogItem::LogLevel::Debug] =  logLevelRegexs["debug"].toString();
+    regexsMap[LogItem::LogLevel::Info] =  logLevelRegexs["info"].toString();
+    regexsMap[LogItem::LogLevel::Warn] =  logLevelRegexs["warn"].toString();
+    regexsMap[LogItem::LogLevel::Error] =  logLevelRegexs["error"].toString();
+    regexsMap[LogItem::LogLevel::Fatal] =  logLevelRegexs["fatal"].toString();
+
+
     m_logWatcher->startWatch(path, [=](QVector<std::shared_ptr<LogItem>> logItems, bool success, QString errStr){
         if (success) {
             m_logData->append(logItems);
@@ -36,7 +43,7 @@ void LogWatcherService::startWork(QString path, StartCallableObject *cbObj, cons
                 emit cbObj->failed(errStr);
             }
         }
-    }, filter);
+    }, filter, logLevel, regexsMap);
 }
 
 void LogWatcherService::stopWork() {
@@ -61,35 +68,8 @@ void LogWatcherService::loadFrontBlock(LoadFrontBlockCallableObject *cbObj) {
     });
 }
 
-void LogWatcherService::setFilter(const QString &regex) {
-    m_filterProxyModel->setFilterFixedString(regex);
-    qDebug() << "set filter: " << regex;
-    qDebug() << "filtered rows: " << m_filterProxyModel->rowCount();
-
-    m_curModel = m_filterProxyModel;
-    QElapsedTimer timer;
-    timer.start();
-    emit logDataChanged();
-    std::cout << timer.elapsed() << "ms" << std::endl;
-}
-
-void LogWatcherService::unsetFilter() {
-    m_curModel = m_logData.get();
-
-    QElapsedTimer timer;
-    timer.start();
-    emit logDataChanged();
-    emit logDataChanged();
-    std::cout << timer.elapsed() << "ms" << std::endl;
-}
-
 QAbstractItemModel *LogWatcherService::logData() {
-    qDebug() << "hahaha";
     return m_curModel;
-}
-
-void LogWatcherService::setLogLevelRegex(QVector<QString> regexs) {
-    m_logData->setLogLevelRegex(regexs);
 }
 
 void LogWatcherService::onCurLineChanged(int curLine) {

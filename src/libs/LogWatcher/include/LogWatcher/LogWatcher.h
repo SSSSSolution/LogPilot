@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QVector>
 #include <QThread>
+#include <QRegularExpression>
 #include <WinExport.h>
 
 class RealWorker;
@@ -35,7 +36,8 @@ public:
     explicit LogWatcher(QObject *parent = nullptr);
     ~LogWatcher();
 
-    void startWatch(const QString &path, LoadBlockCallback callback, const QString &filter);
+    void startWatch(const QString &path, LoadBlockCallback callback, const QString &filter,
+                    LogItem::LogLevel level, const std::map<LogItem::LogLevel, QString> &logLevelRegexs);
 
     void stopWatch();
 
@@ -65,6 +67,8 @@ public:
 
     void setFilter(const QString &filter);
 
+    void setLogLevel(LogItem::LogLevel level, const std::map<LogItem::LogLevel, QString> &logLevelRegexs);
+
     void setStartCallback(QObject *sender, LoadBlockCallback callback);
 
     void startWork();
@@ -88,6 +92,8 @@ private:
     QString m_filePath;
     QFile   m_curFile;
     QString m_filter;
+    LogItem::LogLevel m_level;
+    std::map<LogItem::LogLevel, QRegularExpression> m_logLevelRegexs;
 
     qint64  m_frontPosition;
     int m_headLine;
