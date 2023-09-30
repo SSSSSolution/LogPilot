@@ -2,10 +2,21 @@ cmake_minimum_required(VERSION 3.16)
 
 project(log_pilot)
 
-qt_add_resources(QRC_WRAPPERS ../../assets/assets.qrc)
-
 qt_add_executable(${PROJECT_NAME}
 	main.cpp
+)
+
+qt_add_resources(${PROJECT_NAME} "assets"
+    PREFIX "/"
+    FILES
+        ../../assets/images/bg.png
+        ../../assets/icons/open-file.svg
+        ../../assets/icons/clip.svg
+        ../../assets/icons/search.svg
+        ../../assets/icons/setting.svg
+        ../../assets/icons/down-arrow.svg
+        ../../assets/icons/scroll-down.svg
+    BASE "../../assets"
 )
 
 qt_add_qml_module(${PROJECT_NAME}

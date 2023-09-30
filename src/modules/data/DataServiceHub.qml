@@ -12,13 +12,44 @@ Item {
         autoScroll = isAuto;
     }
 
+    // Log file
+    property string curLogFile: ""
+
+    function extractFilePath(url) {
+        var urlString = url.toString();
+        var filePrefix = "file:///";
+        if (urlString.indexOf(filePrefix) === 0) {
+            return urlString.substring(filePrefix.length)
+        }
+        return urlString
+    }
+
+    function urlsAreEqual(url1, url2) {
+        var absPath1 = extractFilePath(url1)
+        var absPath2 = extractFilePath(url2)
+        return absPath1 === absPath2
+    }
+
+    function setLogFile(logFile) {
+        if (urlsAreEqual(logFile, curLogFile)) {
+            return;
+        }
+
+        curLogFile = extractFilePath(logFile)
+        logLevel = 0
+        filter = ""
+
+        stopWatch();
+        restartTimer.start();
+    }
+
     // Log Level
     property var logRegexMap: null
-    property int logLevel: -1 // -1 ~ 5
+    property int logLevel: 0 // 0 ~ 5
     function setLogLevel(level) {
         if (isNaN(level)) {
             console.warn("Input log level ", level , " is not a number.");
-        } else if (level < -1 || level > 5){
+        } else if (level <= -1 || level > 5){
             console.warn("Invalid log level: ", level);
             return;
         }
@@ -55,7 +86,7 @@ Item {
             var regexStr = filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             filterRegExp = new RegExp(regexStr, 'gi')
 
-            hub.startWatch("C:\\tmp\\log.txt")
+            hub.startWatch(curLogFile)
             hub.setAutoScroll(true);
         }
     }
@@ -127,8 +158,6 @@ Item {
             "error" : "\\[Error",
             "fatal" : "\\[Fatal",
         }
-
-        DataServiceHub.startWatch("C:\\tmp\\log.txt")
     }
 }
 

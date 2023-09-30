@@ -17,7 +17,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 endif()
 
 
-find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick Core5Compat)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Qml Quick Core5Compat)
 qt_standard_project_setup(REQUIRES 6.5)
 
 list(APPEND QML_DIRS "${CMAKE_CURRENT_BINARY_DIR}/src/modules")

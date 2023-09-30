@@ -6,6 +6,7 @@
 #include <QThread>
 #include <QDebug>
 
+
 void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     Q_UNUSED(context);
