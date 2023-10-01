@@ -1,5 +1,6 @@
 #include "LogWatcher/LogWatcher.h"
 #include <QFile>
+#include <QCoreApplication>
 #include <QTextStream>
 #include <QThread>
 #include <QTimer>
@@ -28,8 +29,8 @@ LogWatcher::~LogWatcher()
 }
 
 void LogWatcher::startWatch(const QString &path, LoadBlockCallback callback, const QString &filter,
-                            LogItem::LogLevel level, const std::map<LogItem::LogLevel, QString> &logLevelRegexs) {
-    m_filePath = path;
+                            LogItem::LogLevel level, const std::map<LogItem::LogLevel, QString> &logLevelRegexs,
+                            int startLine) {
     connect(m_worker.get(), &RealWorker::newTailLogs,
             this, &LogWatcher::newTailLogs, Qt::QueuedConnection);
     connect(this, &LogWatcher::triggerLoadFrontBlock,
@@ -38,6 +39,7 @@ void LogWatcher::startWatch(const QString &path, LoadBlockCallback callback, con
     m_worker->setFilePath(path);
     m_worker->setFilter(filter);
     m_worker->setLogLevel(level, logLevelRegexs);
+    m_worker->setStartLine(startLine);
     m_worker->setStartCallback(this, callback);
     m_workerThread.start();
 }
@@ -80,6 +82,10 @@ void RealWorker::setLogLevel(LogItem::LogLevel level, const std::map<LogItem::Lo
     }
 }
 
+void RealWorker::setStartLine(int line) {
+    m_startLine = line;
+}
+
 void RealWorker::setStartCallback(QObject *sender, LoadBlockCallback callback) {
     m_startLoadCallbackSender = sender;
     m_startLoadCallback = callback;
@@ -96,7 +102,6 @@ static void sendBackCallback(QObject *sender, LoadBlockCallback callback,
 }
 
 void RealWorker::startWork() {
-    qDebug() << "worker thread" << QThread::currentThread();
     qDebug() << "real worker start work!";
     QVector<std::shared_ptr<LogItem>> blockLogs;
 
@@ -109,10 +114,10 @@ void RealWorker::startWork() {
 
     recordLinePosMap();
 
-    if (m_tailLine > 0) {
+    if (m_tailLine > 0 && m_startLine <= m_tailLine) {
         int startLine = m_tailLine - BlockSize + 1;
-        if (startLine < 1) {
-            startLine = 1;
+        if (startLine < m_startLine) {
+            startLine = m_startLine;
         }
         m_headLine = startLine;
 
@@ -173,6 +178,13 @@ void RealWorker::startWork() {
                 log->msg = line.trimmed();
                 log->line = m_tailLine + 1;
 
+                m_tailLine++;
+                m_linePosMap[m_tailLine + 1] = m_linePosMap[m_tailLine] + line.size();
+
+                if (m_tailLine < m_startLine) {
+                    continue;
+                }
+
                 // process log level
                 bool found = false;
                 for (auto &it : m_logLevelRegexs) {
@@ -183,6 +195,7 @@ void RealWorker::startWork() {
                         break;
                     }
                 }
+
                 if (!found) {
                     log->level = LogItem::LogLevel::None;
                 }
@@ -194,9 +207,6 @@ void RealWorker::startWork() {
                 if (m_filter.isEmpty() || log->msg.contains(m_filter, Qt::CaseInsensitive)) {
                     newLogs.push_back(log);
                 }
-                m_tailLine++;
-                m_linePosMap[m_tailLine + 1] = m_linePosMap[m_tailLine] + line.size();
-
             }
             if (newLogs.size() > 0) {
                 emit newTailLogs(newLogs);
@@ -228,14 +238,14 @@ void RealWorker::stopWork() {
 void RealWorker::loadFrontBlock(QObject *sender, LoadBlockCallback callback) {
     QVector<std::shared_ptr<LogItem>> blockLogs;
 
-    if (m_headLine <= 0) {
+    if (m_headLine <= 0 || m_headLine < m_startLine) {
         sendBackCallback(sender, callback, blockLogs, false, "NO MORE LOGS");
         return;
     }
 
     int startLine = m_headLine - BlockSize + 1;
-    if (startLine < 1) {
-        startLine = 1;
+    if (startLine < m_startLine) {
+        startLine = m_startLine;
     }
 
     int startPos = m_linePosMap[startLine];

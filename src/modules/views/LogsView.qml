@@ -53,8 +53,6 @@ ListView {
     property real lastContentY: 0
     property string scrollDirection: "None"
 
-
-
     onMovingChanged: {
         if (moving) {
             DataServiceHub.setAutoScroll(false);
@@ -78,17 +76,14 @@ ListView {
                 logView.positionViewAtEnd();
             }
         }
-
     }
 
-    ScrollBar.vertical:  ScrollBar{
+    ScrollBar.vertical:  DefaultScrollBar{
         id: scrollBar
-        policy: ScrollBar.AlwaysOn
-
         snapMode: ScrollBar.NoSnap
+        animationRunning: DataServiceHub.autoScroll
 
-        onActiveChanged: {
-        }
+        visible: logView.contentHeight > logView.height
 
         onPressedChanged: {
             if (pressed) {
@@ -164,7 +159,7 @@ ListView {
         loops: 1
         running: false
         PropertyAnimation {
-            to: logView.contentHeight + logView.originY
+            to: logView.contentHeight + logView.originY - logView.height
             duration: 250
         }
 
@@ -198,6 +193,5 @@ ListView {
         property int pixelSize: 16
     }
 }
-
 
 }

@@ -37,7 +37,8 @@ public:
     ~LogWatcher();
 
     void startWatch(const QString &path, LoadBlockCallback callback, const QString &filter,
-                    LogItem::LogLevel level, const std::map<LogItem::LogLevel, QString> &logLevelRegexs);
+                    LogItem::LogLevel level, const std::map<LogItem::LogLevel, QString> &logLevelRegexs,
+                    int startLine);
 
     void stopWatch();
 
@@ -52,7 +53,6 @@ private:
 
 private:
     QThread m_workerThread;
-    QString m_filePath;
 
     std::unique_ptr<RealWorker> m_worker;
 };
@@ -68,6 +68,8 @@ public:
     void setFilter(const QString &filter);
 
     void setLogLevel(LogItem::LogLevel level, const std::map<LogItem::LogLevel, QString> &logLevelRegexs);
+
+    void setStartLine(int line);
 
     void setStartCallback(QObject *sender, LoadBlockCallback callback);
 
@@ -94,6 +96,7 @@ private:
     QString m_filter;
     LogItem::LogLevel m_level;
     std::map<LogItem::LogLevel, QRegularExpression> m_logLevelRegexs;
+    int m_startLine;
 
     qint64  m_frontPosition;
     int m_headLine;

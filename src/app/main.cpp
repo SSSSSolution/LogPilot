@@ -38,12 +38,32 @@ void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const Q
     ts << txt;
 }
 
+void startTest() {
+    QTimer *testTimer = new QTimer();
+    QObject::connect(testTimer, &QTimer::timeout, testTimer, [](){
+        static int i = 0;
+
+        QString testLogFile = "C:\\tmp\\log.txt";
+        QFile logFile(testLogFile);
+        logFile.open(QIODevice::WriteOnly | QIODevice::Append);
+        QTextStream ts(&logFile);
+        ts << "[trace] test info test info tet info" << i++ << "\n";
+        ts << "[debug] test info test info tet info" << i++ << "\n";
+        ts << "[info] test info test info tet info" << i++ << "\n";
+        ts << "[warning] test info test info tet info" << i++ << "\n";
+        ts << "[error] test info test info tet info" << i++ << "\n";
+        ts << "[fatal] test info test info tet info" << i++ << "\n";
+    });
+    testTimer->start(300);
+}
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
     qInstallMessageHandler(myMessageHandler);
+
+//    startTest();
 
     QQmlApplicationEngine engine;
 

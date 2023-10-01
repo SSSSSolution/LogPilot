@@ -60,7 +60,7 @@ public:
     ~LogWatcherService() = default;
 
     Q_INVOKABLE void startWork(QString path, StartCallableObject *cbObj, const QString &filter,
-                               LogItem::LogLevel logLevel, const QVariantMap &logLevelRegexs);
+                               LogItem::LogLevel logLevel, const QVariantMap &logLevelRegexs, int startLine);
 
     Q_INVOKABLE void stopWork();
 

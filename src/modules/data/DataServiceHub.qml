@@ -7,7 +7,7 @@ Item {
     id: hub
     property string name: "Singleton"
 
-    property bool autoScroll: true
+    property bool autoScroll: false
     function setAutoScroll(isAuto) {
         autoScroll = isAuto;
     }
@@ -38,6 +38,8 @@ Item {
         curLogFile = extractFilePath(logFile)
         logLevel = 0
         filter = ""
+        clipLine = 0;
+        autoScroll = true;
 
         stopWatch();
         restartTimer.start();
@@ -74,6 +76,22 @@ Item {
         restartTimer.start()
     }
 
+    // clip line
+    property int clipLine: 0
+    function setClipLine(line) {
+        if (clipLine < 0) {
+            return
+        }
+        if (line === clipLine) {
+            return
+        }
+
+        clipLine = line
+        DataServiceHub.stopWatch();
+        restartTimer.start()
+    }
+
+    // start timer
     Timer {
         id: restartTimer
         interval: 0
@@ -86,11 +104,10 @@ Item {
             var regexStr = filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             filterRegExp = new RegExp(regexStr, 'gi')
 
-            hub.startWatch(curLogFile)
+            hub.startWatch()
             hub.setAutoScroll(true);
         }
     }
-
 
     signal started()
 
@@ -106,9 +123,9 @@ Item {
         }
     }
 
-    function startWatch(path) {
+    function startWatch() {
         var startCbObj = startCallback.createObject()
-        logWatcherService.startWork(path, startCbObj, filter, logLevel, logRegexMap);
+        logWatcherService.startWork(curLogFile, startCbObj, filter, logLevel, logRegexMap, clipLine);
     }
 
     function stopWatch() {
@@ -160,31 +177,3 @@ Item {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

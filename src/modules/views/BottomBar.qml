@@ -6,7 +6,6 @@ import src.modules.components 1.0
 Rectangle {
     color: "black"
 
-
     LevelComboBox {
         anchors {
             verticalCenter: parent.verticalCenter
@@ -18,6 +17,8 @@ Rectangle {
         height: 22
 
         fontPointSize: 9
+
+        enabled: DataServiceHub.curLogFile !== ""
 
         currentIndex: 5 - DataServiceHub.logLevel
 

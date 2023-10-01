@@ -16,7 +16,7 @@ LogWatcherService::LogWatcherService() {
 }
 
 void LogWatcherService::startWork(QString path, StartCallableObject *cbObj, const QString &filter,
-                                  LogItem::LogLevel logLevel, const QVariantMap &logLevelRegexs) {
+                                  LogItem::LogLevel logLevel, const QVariantMap &logLevelRegexs, int startLine) {
     qDebug() << "log watcher service: START at " << path;
 
     m_logData->clear();
@@ -43,7 +43,7 @@ void LogWatcherService::startWork(QString path, StartCallableObject *cbObj, cons
                 emit cbObj->failed(errStr);
             }
         }
-    }, filter, logLevel, regexsMap);
+    }, filter, logLevel, regexsMap, startLine);
 }
 
 void LogWatcherService::stopWork() {

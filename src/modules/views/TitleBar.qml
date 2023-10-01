@@ -8,6 +8,10 @@ import src.modules.components 1.0
 Rectangle {
     color: "black"
 
+    function convertStrToNumber(str) {
+        var num = parseInt(str);
+        return isNaN(num) ? 0 : num;
+    }
 
     OpenFileButton {
         id: openBtn
@@ -54,6 +58,10 @@ Rectangle {
         }
         width: 80
         height: 18
+
+        Keys.onReturnPressed: {
+            DataServiceHub.setClipLine(convertStrToNumber(textInput.text));
+        }
     }
 
     ClipButton {
@@ -65,23 +73,9 @@ Rectangle {
         }
         width: 20
         height: 20
-    }
 
-    DefaultIconButton {
-        id: autoScrollIndicator
-        iconSrc: "qrc:/icons/down-arrow.svg"
-        anchors {
-            right: aboutBtn.left
-            rightMargin: 10
-            verticalCenter: parent.verticalCenter
-        }
-        width: 20
-        height: 20
-        opacity: {
-            if (DataServiceHub.autoScroll && DataServiceHub.curLogFile !== "") {
-                return 1.0
-            }
-            return 0.5
+        onClicked: {
+            DataServiceHub.setClipLine(convertStrToNumber(clipTextInput.textInput.text));
         }
     }
 

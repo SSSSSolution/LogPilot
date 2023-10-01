@@ -2,7 +2,6 @@
 
 LogData::LogData(LogWatcher *logWatcher) {
     m_logWatcher = logWatcher;
-
 }
 
 int LogData::rowCount(const QModelIndex& parent) const {
@@ -10,7 +9,7 @@ int LogData::rowCount(const QModelIndex& parent) const {
 }
 
 QVariant LogData::data(const QModelIndex& index, int role) const {
-    if (index.row() < 0 || index.row() >= m_logs.size()) {
+    if (index.row() < 0 || index.row() >= rowCount()) {
         return QVariant();
     }
 

@@ -11,6 +11,7 @@ set(QML_FILES
     DefaultTextInput.qml
     DefaultTextButton.qml
     LevelComboBox.qml
+    DefaultScrollBar.qml
 )
 
 qt_add_qml_module(${PROJECT_NAME}
