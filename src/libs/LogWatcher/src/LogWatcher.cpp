@@ -230,6 +230,7 @@ void RealWorker::stopWork() {
         m_pollTimer->deleteLater();
         m_curFile.close();
     }
+
     m_filePath = "";
     m_filter = "";
     m_linePosMap.clear();

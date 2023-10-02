@@ -63,7 +63,7 @@ Rectangle {
         height: 18
 
         Keys.onReturnPressed: {
-            DataServiceHub.setClipLine(convertStrToNumber(textInput.text));
+            DataServiceHub.setClipLine(convertStrToNumber(textInput.text))
         }
 
         enabled: DataServiceHub.logLoaded
@@ -80,7 +80,7 @@ Rectangle {
         height: 20
 
         onClicked: {
-            DataServiceHub.setClipLine(convertStrToNumber(clipTextInput.textInput.text));
+            DataServiceHub.setClipLine(convertStrToNumber(clipTextInput.textInput.text))
         }
 
         enabled: DataServiceHub.logLoaded
