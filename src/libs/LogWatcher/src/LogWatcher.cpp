@@ -238,7 +238,7 @@ void RealWorker::stopWork() {
 void RealWorker::loadFrontBlock(QObject *sender, LoadBlockCallback callback) {
     QVector<std::shared_ptr<LogItem>> blockLogs;
 
-    if (m_headLine <= 0 || m_headLine < m_startLine) {
+    if (m_headLine <= 0 || m_headLine <= m_startLine) {
         sendBackCallback(sender, callback, blockLogs, false, "NO MORE LOGS");
         return;
     }
@@ -278,7 +278,8 @@ void RealWorker::loadFrontBlock(QObject *sender, LoadBlockCallback callback) {
         }
     }
 
-    m_headLine = m_headLine - BlockSize;
+    m_headLine = startLine;
+
     sendBackCallback(sender, callback, blockLogs, true);
 }
 
@@ -287,19 +288,16 @@ void RealWorker::recordLinePosMap() {
     int curPos = 0;
 
     m_curFile.seek(0);
+    m_linePosMap[0] = 0;
     while (!m_curFile.atEnd()) {
         QByteArray line = m_curFile.readLine();
         m_linePosMap[lineIdx++] = curPos;
         curPos += line.size();
     }
+    m_linePosMap[lineIdx] = curPos;
 
     m_tailLine = lineIdx - 1;
-    m_headLine = m_tailLine - 1;
-
-    qDebug() << m_tailLine << ", " << m_headLine;
-
-    // Record pos of last line's next line
-    m_linePosMap[m_tailLine + 1] = curPos;
+    m_headLine = m_tailLine;
 }
 
 
