@@ -43,11 +43,14 @@ Rectangle {
         anchors {
             left: openBtn.right
             leftMargin: 10
+            right: clipTextInput.left
+            rightMargin: 10
             verticalCenter: parent.verticalCenter
         }
-        width: contentWidth
         height: contentHeight
         text: DataServiceHub.curLogFile
+        elide: Text.ElideMiddle
+        horizontalAlignment: Text.AlignLeft
     }
 
     DefaultTextInput {
