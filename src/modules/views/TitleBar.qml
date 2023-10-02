@@ -62,6 +62,8 @@ Rectangle {
         Keys.onReturnPressed: {
             DataServiceHub.setClipLine(convertStrToNumber(textInput.text));
         }
+
+        enabled: DataServiceHub.logLoaded
     }
 
     ClipButton {
@@ -77,6 +79,8 @@ Rectangle {
         onClicked: {
             DataServiceHub.setClipLine(convertStrToNumber(clipTextInput.textInput.text));
         }
+
+        enabled: DataServiceHub.logLoaded
     }
 
     DefaultTextButton {

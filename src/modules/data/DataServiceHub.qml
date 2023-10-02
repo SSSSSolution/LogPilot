@@ -12,6 +12,8 @@ Item {
         autoScroll = isAuto;
     }
 
+    property bool logLoaded: false
+
     // Log file
     property string curLogFile: ""
 
@@ -116,6 +118,7 @@ Item {
         StartCallableObject {
             onSuccessed: {
                 console.log("start success");
+                logLoaded = true
                 DataServiceHub.loadFrontBlock()
             }
             onFailed: {
@@ -130,6 +133,7 @@ Item {
 
     function stopWatch() {
         logWatcherService.stopWork();
+        logLoaded = false
     }
 
     property bool frontBlockLoading: false

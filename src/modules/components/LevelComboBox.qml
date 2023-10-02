@@ -17,7 +17,12 @@ ComboBox {
         anchors.fill: parent
 
         text: currentText
-        color: currentValue
+        color: {
+            if (c.enabled === false) {
+                return "#88" + currentValue.slice(1)
+            }
+            return currentValue
+        }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         font.pointSize: c.fontPointSize

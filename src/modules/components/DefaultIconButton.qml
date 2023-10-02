@@ -20,6 +20,9 @@ Button {
         fillMode: IconImage.Stretch
 
         color: {
+            if (c.enabled === false) {
+                return Qt.darker(c.iconColor, 1.5)
+            }
             if (c.pressed) {
                 return Qt.darker(c.iconColor, 1.3)
             } else if (c.hovered) {

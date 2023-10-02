@@ -18,7 +18,7 @@ Rectangle {
 
         fontPointSize: 9
 
-        enabled: DataServiceHub.curLogFile !== ""
+        enabled: DataServiceHub.logLoaded
 
         currentIndex: 5 - DataServiceHub.logLevel
 
@@ -72,6 +72,8 @@ Rectangle {
         Keys.onReturnPressed: {
             DataServiceHub.setFilter(textInput.text);
         }
+
+        enabled: DataServiceHub.logLoaded
     }
 
     SearchButton {
@@ -87,6 +89,8 @@ Rectangle {
         onClicked: {
             DataServiceHub.setFilter(searchTextInput.textInput.text);
         }
+
+        enabled: DataServiceHub.logLoaded
     }
 
     DefaultIconButton {
