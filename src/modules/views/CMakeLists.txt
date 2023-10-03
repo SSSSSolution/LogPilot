@@ -6,6 +6,7 @@ set(QML_FILES
     TitleBar.qml
     BottomBar.qml
     LogsView.qml
+    AboutView.qml
 )
 
 qt_add_qml_module(${PROJECT_NAME}

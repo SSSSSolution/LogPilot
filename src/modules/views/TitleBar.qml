@@ -98,5 +98,63 @@ Rectangle {
         textItem.font.pointSize: 9
         width: 42
         height: 16
+
+        enabled: DataServiceHub.curLogFile !== ""
+
+        onClicked: {
+            if (aboutViewLoader.item == null) {
+                aboutViewLoader.sourceComponent = aboutPopup
+            } else {
+                aboutViewLoader.item.open();
+            }
+        }
+    }
+
+    Loader {
+        id: aboutViewLoader
+        sourceComponent: undefined
+        onLoaded: {
+            item.open();
+        }
+
+        Connections {
+            target: aboutViewLoader.item
+
+            function onClosed() {
+                aboutViewLoader.sourceComponent = undefined
+            }
+        }
+    }
+
+    Component {
+        id: aboutPopup
+
+        Popup {
+            x: mainWindow.width / 2 - width / 2
+            y: 100
+
+            width: 400
+            height: 300
+
+            modal: true
+            closePolicy: Popup.CloseOnPressOutside
+            dim: false
+
+            background: Rectangle {
+                color: "#3D3D3D"
+                radius: 20
+            }
+
+            contentItem: Item {
+                anchors.fill: parent
+                AboutView {
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                        right: parent.right
+                    }
+                }
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QTimer>
 #include <QThread>
+#include <QFontDatabase>
 #include <QDebug>
 
 
@@ -57,17 +58,51 @@ void startTest() {
     testTimer->start(300);
 }
 
+void loadFonts() {
+    int fontId = QFontDatabase::addApplicationFont(":/fonts/Sansation-Regular.ttf");
+    if (fontId != -1) {
+        QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
+        qDebug() << "Load font: " << fontFamilies;
+    } else {
+        qDebug() << "Failed to load font.";
+    }
+
+    fontId = QFontDatabase::addApplicationFont(":/fonts/JosefinSlab-Regular.ttf");
+    if (fontId != -1) {
+        QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
+        qDebug() << "Load font: " << fontFamilies;
+    } else {
+        qDebug() << "Failed to load font.";
+    }
+
+    fontId = QFontDatabase::addApplicationFont(":/fonts/JosefinSlab-Bold.ttf");
+    if (fontId != -1) {
+        QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
+        qDebug() << "Load font: " << fontFamilies;
+    } else {
+        qDebug() << "Failed to load font.";
+    }
+}
+
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
     qInstallMessageHandler(myMessageHandler);
 
+    app.setApplicationName(APP_NAME);
+    app.setApplicationVersion(GIT_HASH);
+
+    loadFonts();
+
 //    startTest();
 
     QQmlApplicationEngine engine;
-
     qDebug() << engine.importPathList();
+
+    engine.rootContext()->setContextProperty("BuildDate", BUILD_DATE);
+    engine.rootContext()->setContextProperty("BuildTime", BUILD_TIME);
+
     QUrl url = QUrl(QStringLiteral("qrc:/qt/qml/Main/Main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app,
                      [url](QObject *obj, const QUrl &objUrl) {

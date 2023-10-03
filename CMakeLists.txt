@@ -24,6 +24,25 @@ list(APPEND QML_DIRS "${CMAKE_CURRENT_BINARY_DIR}/src/modules")
 set(QML_IMPORT_PATH "${QML_DIRS}" CACHE STRING "" FORCE)
 
 
+# Get git hash
+execute_process(
+    COMMAND git rev-parse --short HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+add_definitions("-DGIT_HASH=\"${GIT_HASH}\"")
+
+message("GIT_HASH = " ${GIT_HASH})
+
+# Get build time
+string(TIMESTAMP CURRENT_DATE "%Y-%m-%d")
+string(TIMESTAMP CURRENT_TIME "%H:%M:%S")
+
+add_definitions("-DBUILD_DATE=\"${CURRENT_DATE}\"")
+add_definitions("-DBUILD_TIME=\"${CURRENT_TIME}\"")
+
 include(GNUInstallDirs)
 
 include_directories(src/libs/WinExport)

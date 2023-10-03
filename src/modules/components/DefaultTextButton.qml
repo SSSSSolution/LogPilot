@@ -19,6 +19,9 @@ Button {
         verticalAlignment: Text.AlignVCenter
 
         color: {
+            if (!c.enabled) {
+                return Qt.darker(c.color, 1.5)
+            }
             if (c.pressed) {
                 return Qt.darker(c.color, 1.3)
             } else if (c.hovered) {

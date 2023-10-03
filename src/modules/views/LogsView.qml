@@ -27,6 +27,15 @@ Pane {
         return resStr
     }
 
+    AboutView {
+        visible: DataServiceHub.curLogFile === ""
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            top: parent.top
+            topMargin: 100
+        }
+    }
+
     ListView {
         id: logView
 

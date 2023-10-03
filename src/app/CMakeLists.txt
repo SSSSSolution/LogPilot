@@ -10,12 +10,16 @@ qt_add_resources(${PROJECT_NAME} "assets"
     PREFIX "/"
     FILES
         ../../assets/images/bg.png
+        ../../assets/images/log-pilot.svg
         ../../assets/icons/open-file.svg
         ../../assets/icons/clip.svg
         ../../assets/icons/search.svg
         ../../assets/icons/setting.svg
         ../../assets/icons/down-arrow.svg
         ../../assets/icons/scroll-down.svg
+        ../../assets/fonts/Sansation-Regular.ttf
+        ../../assets/fonts/JosefinSlab-Regular.ttf
+        ../../assets/fonts/JosefinSlab-Bold.ttf
     BASE "../../assets"
 )
 
@@ -38,7 +42,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         data
 )
 
-target_sources(${PROJECT_NAME} PRIVATE ${QRC_WRAPPERS})
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE "APP_NAME=\"Log Pilot\""
+)
 
 install(TARGETS ${PROJECT_NAME}
     BUNDLE DESTINATION .
