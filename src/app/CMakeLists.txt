@@ -4,6 +4,7 @@ project(log_pilot)
 
 qt_add_executable(${PROJECT_NAME}
 	main.cpp
+    app.rc
 )
 
 qt_add_resources(${PROJECT_NAME} "assets"
@@ -63,4 +64,3 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     )
     install (SCRIPT ${deploy_script})
 endif()
-
