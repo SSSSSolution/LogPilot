@@ -8,7 +8,7 @@ import src.modules.views 1.0
 ApplicationWindow {
     id: mainWindow
     visible: true
-    title: ""
+    title: " "
 
     height: 780
     width: 1280

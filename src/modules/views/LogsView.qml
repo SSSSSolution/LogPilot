@@ -181,6 +181,7 @@ Pane {
             id: scrollDownAnimation
             loops: 1
             running: false
+
             PropertyAnimation {
                 to: logView.contentHeight + logView.originY - logView.height
                 duration: 250
@@ -205,7 +206,10 @@ Pane {
 
             enabled: !DataServiceHub.autoScroll
 
-            onClicked: {
+            onPressed: {
+                if (scrollDownAnimation.running) {
+                    return
+                }
                 scrollDownAnimation.start()
             }
         }
