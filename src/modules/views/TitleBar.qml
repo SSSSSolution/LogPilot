@@ -103,9 +103,10 @@ Rectangle {
 
         onClicked: {
             if (aboutViewLoader.item == null) {
-                aboutViewLoader.sourceComponent = aboutPopup
+                aboutViewLoader.sourceComponent = aboutPopupComponent
             } else {
                 aboutViewLoader.item.open();
+                DataServiceHub.mainWindowNeedBlur = true
             }
         }
     }
@@ -115,6 +116,7 @@ Rectangle {
         sourceComponent: undefined
         onLoaded: {
             item.open();
+            DataServiceHub.mainWindowNeedBlur = true
         }
 
         Connections {
@@ -127,17 +129,18 @@ Rectangle {
     }
 
     Component {
-        id: aboutPopup
+        id: aboutPopupComponent
 
         Popup {
+            id: aboutPopup
             x: mainWindow.width / 2 - width / 2
             y: 100
 
             width: 400
-            height: 300
+            height: 335
 
             modal: true
-            closePolicy: Popup.CloseOnPressOutside
+            closePolicy: Popup.NoAutoClose
             dim: false
 
             background: Rectangle {
@@ -148,10 +151,33 @@ Rectangle {
             contentItem: Item {
                 anchors.fill: parent
                 AboutView {
+                    id: aboutView
                     anchors {
                         top: parent.top
                         left: parent.left
                         right: parent.right
+                    }
+                }
+
+                DefaultTextButton {
+                    anchors {
+                        bottom: parent.bottom
+                        bottomMargin: 10
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                    width: 70
+                    height: 20
+                    textItem.text: "OK"
+                    textItem.font.pixelSize: 14
+                    color: "#E48832"
+                    backgroundItem.color: "#525252"
+                    backgroundItem.radius: 3
+                    backgroundItem.border.color: "#757575"
+                    backgroundItem.border.width: 1
+
+                    onClicked: {
+                        aboutPopup.close()
+                        DataServiceHub.mainWindowNeedBlur = false
                     }
                 }
             }

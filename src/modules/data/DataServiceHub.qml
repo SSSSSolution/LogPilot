@@ -14,6 +14,8 @@ Item {
 
     property bool logLoaded: false
 
+    // View
+    property bool mainWindowNeedBlur: false
     // config
     readonly property string defaultConfigPath: ":/configs/LogPilotConfig.json"
     property string userConfigPath: ""

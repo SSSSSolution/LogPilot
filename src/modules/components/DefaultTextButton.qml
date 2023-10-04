@@ -5,10 +5,18 @@ Button {
     id: c
 
     property alias textItem: textItem
+    property alias backgroundItem: backgroundItem
     property string color: "#9B9B9B"
 
+    padding: 0
+
     background: Rectangle {
+        id: backgroundItem
         color: "transparent"
+        border {
+            width: 0
+            color: "transparent"
+        }
     }
 
     contentItem: Text {

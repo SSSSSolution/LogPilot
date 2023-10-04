@@ -106,7 +106,6 @@ Rectangle {
             rightMargin: 20
         }
 
-
         height: 25
         width: 25
         iconSrc: "qrc:/icons/setting.svg"

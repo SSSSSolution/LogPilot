@@ -25,6 +25,13 @@ qt_add_resources(${PROJECT_NAME} "assets"
     BASE "../../assets"
 )
 
+qt_add_shaders(${PROJECT_NAME} "shaders"
+    PREFIX "/"
+    FILES
+        ../../assets/shaders/blur.frag
+    BASE "../../assets"
+)
+
 qt_add_qml_module(${PROJECT_NAME}
     URI Main
     VERSION 1.0
