@@ -53,7 +53,7 @@ Pane {
             width: contentWidth
             height: contentHeight
 
-            text: "Copyright ©2023 Huang Wei"
+            text: "Copyright ©2023 Huang Wei | 黄微"
             color: "#E0E0E0"
         }
 

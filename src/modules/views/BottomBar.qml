@@ -4,7 +4,18 @@ import src.modules.data 1.0
 import src.modules.components 1.0
 
 Rectangle {
+    id: r
     color: "black"
+
+    property var levelsConfig: DataServiceHub.curConfig.levels
+
+    onLevelsConfigChanged: {
+        // Reset level Model
+        const levels = ["fatal", "error", "warn", "info", "debug", "trace", "none"];
+        for (let level of levels) {
+            levelModel.append({level: level.toUpperCase(), color: levelsConfig[level].color});
+        }
+    }
 
     LevelComboBox {
         anchors {
@@ -20,32 +31,26 @@ Rectangle {
 
         enabled: DataServiceHub.logLoaded
 
-        currentIndex: 5 - DataServiceHub.logLevel
+        currentIndex: 6 - DataServiceHub.logLevel
 
         model: ListModel {
-            ListElement { level: "FATAL"; color: "#FF0006"}
-            ListElement { level: "ERROR"; color: "#FF6B68"}
-            ListElement { level: "WARN"; color: "#0070BB"}
-            ListElement { level: "INFO"; color: "#48BB31"}
-            ListElement { level: "DEBUG"; color: "#faaa0a"}
-            ListElement { level: "TRACE"; color: "#FFFFFF"}
+            id: levelModel
         }
 
         onCurrentTextChanged: {
-            if (currentIndex === 5 - DataServiceHub.logLevel)
-                return;
-
             if (currentText === "FATAL") {
-                DataServiceHub.setLogLevel(5);
+                DataServiceHub.setLogLevel(6);
             } else if (currentText === "ERROR") {
-                DataServiceHub.setLogLevel(4);
+                DataServiceHub.setLogLevel(5);
             } else if (currentText === "WARN") {
-                DataServiceHub.setLogLevel(3);
+                DataServiceHub.setLogLevel(4);
             } else if (currentText === "INFO") {
-                DataServiceHub.setLogLevel(2);
+                DataServiceHub.setLogLevel(3);
             } else if (currentText === "DEBUG") {
-                DataServiceHub.setLogLevel(1);
+                DataServiceHub.setLogLevel(2);
             } else if (currentText === "TRACE") {
+                DataServiceHub.setLogLevel(1);
+            } else if (currentText === "NONE") {
                 DataServiceHub.setLogLevel(0);
             } else {
                 console.error("Unknow level: ", currentText)

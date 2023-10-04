@@ -21,6 +21,7 @@ qt_add_resources(${PROJECT_NAME} "assets"
         ../../assets/fonts/Sansation-Regular.ttf
         ../../assets/fonts/JosefinSlab-Regular.ttf
         ../../assets/fonts/JosefinSlab-Bold.ttf
+        ../../assets/configs/LogPilotConfig.json
     BASE "../../assets"
 )
 

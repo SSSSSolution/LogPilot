@@ -1,0 +1,31 @@
+{
+    "levels" : {
+        "none": {
+            "color": "#E0E0E0"
+        },
+        "trace": {
+            "color": "#FFFFFF",
+            "regex": "\\[trace"
+        },
+        "debug": {
+            "color": "#faaa0a",
+            "regex": "\\[debug"
+        },
+        "info": {
+            "color": "#48BB31",
+            "regex": "\\[info"
+        },
+        "warn": {
+            "color": "#0070BB",
+            "regex": "\\[warn"
+        },
+        "error": {
+            "color": "#FF6B68",
+            "regex": "\\[error"
+        },
+        "fatal": {
+            "color": "#FF0006",
+            "regex": "\\[fatal"
+        }
+    }
+}

@@ -12,6 +12,8 @@ Pane {
 
     padding: 0
 
+    property var levelsConfig: DataServiceHub.curConfig.levels
+
     function replaceFilterText(msg) {
         if (typeof msg !== 'string'|| msg.trim() === "") {
             return ""
@@ -151,19 +153,21 @@ Pane {
 
                 property string fontColor: {
                     if (model.level === 0) {
-                        return "#FFFFFF"; // Trace
+                        return levelsConfig.none.color
                     } else if (model.level === 1) {
-                        return "#faaa0a";
+                        return levelsConfig.trace.color
                     } else if (model.level === 2) {
-                        return "#48BB31";  // Info
+                        return levelsConfig.debug.color
                     } else if (model.level === 3) {
-                        return "#0070BB"; // Warn
+                        return levelsConfig.info.color
                     } else if (model.level === 4) {
-                        return "#FF6B68"; // Error
+                        return levelsConfig.warn.color
                     } else if (model.level === 5) {
-                        return "#FF0006"; // Fatal
+                        return levelsConfig.error.color
+                    } else if (model.level === 6) {
+                        return levelsConfig.fatal.color
                     } else {
-                        return "#FFFFFF" // Normal
+                        return "#000000" // unknow
                     }
                 }
 

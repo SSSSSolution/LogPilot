@@ -14,6 +14,11 @@ Item {
 
     property bool logLoaded: false
 
+    // config
+    readonly property string defaultConfigPath: ":/configs/LogPilotConfig.json"
+    property string userConfigPath: ""
+    property var curConfig: undefined
+
     // Log file
     property string curLogFile: ""
 
@@ -38,7 +43,7 @@ Item {
         }
 
         curLogFile = extractFilePath(logFile)
-        logLevel = 0
+        logLevel = 1
         filter = ""
         clipLine = 0;
         autoScroll = true;
@@ -49,11 +54,11 @@ Item {
 
     // Log Level
     property var logRegexMap: null
-    property int logLevel: 0 // 0 ~ 5
+    property int logLevel: 1 // 0 ~ 6
     function setLogLevel(level) {
         if (isNaN(level)) {
             console.warn("Input log level ", level , " is not a number.");
-        } else if (level <= -1 || level > 5){
+        } else if (level < 0 || level > 6){
             console.warn("Invalid log level: ", level);
             return;
         }
@@ -170,14 +175,29 @@ Item {
         id: logWatcherService
     }
 
+    FileIO {
+        id: fileIO
+    }
+
     Component.onCompleted: {
-        logRegexMap = {
-            "trace" : "\\[Trace",
-            "debug" : "\\[Debug",
-            "info" : "\\[Info",
-            "warn" : "\\[Warn",
-            "error" : "\\[Error",
-            "fatal" : "\\[Fatal",
+        try {
+            curConfig = JSON.parse(fileIO.read(defaultConfigPath))
+        } catch (error) {
+            console.log("Load default config failed: ", error.message)
+            Qt.exit(-1)
+        }
+    }
+
+    onCurConfigChanged: {
+        if (!(curConfig == null)) {
+            logRegexMap = {
+                "trace" : curConfig.levels.trace.regex,
+                "debug" : curConfig.levels.debug.regex,
+                "info" : curConfig.levels.info.regex,
+                "warn" : curConfig.levels.warn.regex,
+                "error" : curConfig.levels.error.regex,
+                "fatal" : curConfig.levels.fatal.regex,
+            }
         }
     }
 }

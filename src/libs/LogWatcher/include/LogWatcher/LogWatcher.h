@@ -13,8 +13,8 @@ class RealWorker;
 
 struct LOG_WATCHER_API LogItem {
     enum LogLevel {
-        None = -1,
-        Trace = 0,
+        None = 0,
+        Trace,
         Debug,
         Info,
         Warn,

@@ -18,6 +18,8 @@ set(CPP_FILES
     LogWatcherService.cpp
     FpsItem.h
     FpsItem.cpp
+    FileIO.h
+    FileIO.cpp
 )
 
 qt_add_qml_module(${PROJECT_NAME}

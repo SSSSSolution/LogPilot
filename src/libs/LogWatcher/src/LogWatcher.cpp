@@ -77,6 +77,9 @@ void RealWorker::setLogLevel(LogItem::LogLevel level, const std::map<LogItem::Lo
     m_level = level;
     m_logLevelRegexs.clear();
     for (auto it : logLevelRegexs) {
+        if (it.first == LogItem::LogLevel::None) {
+            continue;
+        }
         QRegularExpression re(it.second, QRegularExpression::CaseInsensitiveOption);
         m_logLevelRegexs[it.first] = re;
     }
