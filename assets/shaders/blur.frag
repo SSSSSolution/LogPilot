@@ -10,7 +10,7 @@ layout(std140, binding = 0) uniform buf {
 
 layout(binding = 1) uniform sampler2D src;
 
-float radius = 7;
+float radius = 10;
 float offset = 0.001;
 
 vec4 getBlurColor(vec2 uv){

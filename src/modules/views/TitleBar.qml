@@ -105,8 +105,7 @@ Rectangle {
             if (aboutViewLoader.item == null) {
                 aboutViewLoader.sourceComponent = aboutPopupComponent
             } else {
-                aboutViewLoader.item.open();
-                DataServiceHub.mainWindowNeedBlur = true
+                return
             }
         }
     }
@@ -124,6 +123,7 @@ Rectangle {
 
             function onClosed() {
                 aboutViewLoader.sourceComponent = undefined
+                DataServiceHub.mainWindowNeedBlur = false
             }
         }
     }
@@ -133,7 +133,8 @@ Rectangle {
 
         Popup {
             id: aboutPopup
-            x: mainWindow.width / 2 - width / 2
+            parent: mainWindow.contentItem
+            x: parent.width / 2 - width / 2
             y: 100
 
             width: 400
@@ -146,6 +147,10 @@ Rectangle {
             background: Rectangle {
                 color: "#3D3D3D"
                 radius: 20
+                border {
+                    width: 1
+                    color: "#88E0E0E0"
+                }
             }
 
             contentItem: Item {
@@ -177,7 +182,6 @@ Rectangle {
 
                     onClicked: {
                         aboutPopup.close()
-                        DataServiceHub.mainWindowNeedBlur = false
                     }
                 }
             }

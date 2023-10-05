@@ -109,6 +109,45 @@ Rectangle {
         height: 25
         width: 25
         iconSrc: "qrc:/icons/setting.svg"
+
+        onClicked: {
+            if (settinvViewLoader.item == null) {
+                settinvViewLoader.sourceComponent = settingPopupComponent
+            } else {
+                return
+            }
+        }
     }
 
+    Loader {
+        id: settinvViewLoader
+        sourceComponent: undefined
+
+        onLoaded: {
+            item.open()
+            DataServiceHub.mainWindowNeedBlur = true
+        }
+
+        Connections {
+            target: settinvViewLoader.item
+
+            function onClosed() {
+                console.log("load item closed")
+                settinvViewLoader.sourceComponent = undefined
+                DataServiceHub.mainWindowNeedBlur = false
+            }
+        }
+    }
+
+    Component {
+        id: settingPopupComponent
+
+        SettingView {
+            id: settingPopup
+            parent: mainWindow.contentItem
+            x: parent.width / 2 - width / 2
+            y: parent.height / 2 - height / 2
+        }
+    }
 }
+

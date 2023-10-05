@@ -7,6 +7,10 @@ set(QML_FILES
     BottomBar.qml
     LogsView.qml
     AboutView.qml
+    SettingView.qml
+    ColorSettingView.qml
+    RegexSettingView.qml
+    FontSettingView.qml
 )
 
 qt_add_qml_module(${PROJECT_NAME}

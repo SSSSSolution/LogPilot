@@ -12,6 +12,9 @@ set(QML_FILES
     DefaultTextButton.qml
     LevelComboBox.qml
     DefaultScrollBar.qml
+    SettingTabBar.qml
+    HueSlider.qml
+    ColorGradientPanel.qml
 )
 
 qt_add_qml_module(${PROJECT_NAME}
