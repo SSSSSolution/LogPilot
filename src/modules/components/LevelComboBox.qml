@@ -18,6 +18,9 @@ ComboBox {
 
         text: currentText
         color: {
+            if (currentValue == null) {
+                return "#FFFFFF"
+            }
             if (c.enabled === false) {
                 return "#88" + currentValue.slice(1)
             }

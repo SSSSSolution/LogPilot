@@ -11,6 +11,7 @@ set(QML_FILES
     ColorSettingView.qml
     RegexSettingView.qml
     FontSettingView.qml
+    LogSessionView.qml
 )
 
 qt_add_qml_module(${PROJECT_NAME}

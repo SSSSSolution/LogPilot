@@ -60,7 +60,7 @@ Rectangle {
             id: dragArea
             anchors.fill: parent
             drag.target: selectionIndicator
-            drag.threshold: 1
+            drag.threshold: 0
             drag.smoothed: false
 
             onPositionChanged: {

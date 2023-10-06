@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
+import Qt.labs.platform
 
 import src.modules.data 1.0
 import src.modules.components 1.0
@@ -12,31 +13,37 @@ Pane {
 
     padding: 0
 
-    property var levelsConfig: DataServiceHub.curConfig.levels
+    property var session: undefined
+    property var levelsConfig: {
+        if (session == null ||  session.config == null)
+            return undefined
+        return session.config.levels
+    }
+
 
     function replaceFilterText(msg) {
         if (typeof msg !== 'string'|| msg.trim() === "") {
             return ""
         }
-        if (DataServiceHub.filter.trim() === "") {
+        if (session.filter.trim() === "") {
             return msg;
         }
 
-        var resStr = msg.replace(DataServiceHub.filterRegExp, function(matched){
+        var resStr = msg.replace(session.filterRegExp, function(matched){
             return "<span style='background-color: rgba(210, 180, 70, 0.3);'>" +  matched + "</span>";
         })
 
         return resStr
     }
 
-    AboutView {
-        visible: DataServiceHub.curLogFile === ""
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-            top: parent.top
-            topMargin: 100
-        }
-    }
+//    AboutView {
+//        visible: DataServiceHub.curLogFile === ""
+//        anchors {
+//            horizontalCenter: parent.horizontalCenter
+//            top: parent.top
+//            topMargin: 100
+//        }
+//    }
 
     ListView {
         id: logView
@@ -71,7 +78,12 @@ Pane {
         cacheBuffer: 1000
         reuseItems: true
         clip: true
-        model: DataServiceHub.logWatcherService.logData
+        model: {
+            if (session == null) {
+                return null
+            }
+            return session.logModel
+        }
 
         boundsBehavior: Flickable.StopAtBounds
         flickDeceleration: 7820
@@ -81,10 +93,10 @@ Pane {
 
         onMovingChanged: {
             if (moving) {
-                DataServiceHub.setAutoScroll(false);
+                session.setAutoScroll(false)
             } else {
                 if ((scrollBar.size + scrollBar.position >= 0.9999999) && (scrollBar.active === false)) {
-                    DataServiceHub.setAutoScroll(true);
+                    session.setAutoScroll(true)
                 }
             }
         }
@@ -97,7 +109,7 @@ Pane {
             triggeredOnStart: true
             repeat: true
             onTriggered: {
-                if (DataServiceHub.autoScroll) {
+                if (session.autoScroll) {
                     logView.positionViewAtEnd();
                 }
             }
@@ -106,23 +118,23 @@ Pane {
         ScrollBar.vertical:  DefaultScrollBar{
             id: scrollBar
             snapMode: ScrollBar.NoSnap
-            animationRunning: DataServiceHub.autoScroll
+            animationRunning: session.autoScroll
 
             visible: logView.contentHeight > logView.height
 
             onPressedChanged: {
                 if (pressed) {
-                    DataServiceHub.setAutoScroll(false);
+                    session.setAutoScroll(false)
                 } else {
                     if ((size + position >= 0.9999999) && (scrollBar.active === false)) {
-                        DataServiceHub.setAutoScroll(true);
+                        session.setAutoScroll(true)
                     }
                 }
             }
 
             onPositionChanged: {
                 if ((size + position >= 0.9999999) && (scrollBar.active === false)) {
-                    DataServiceHub.setAutoScroll(true);
+                    session.setAutoScroll(true)
                 }
             }
         }
@@ -192,7 +204,7 @@ Pane {
             }
 
             onFinished: {
-                DataServiceHub.setAutoScroll(true);
+                session.setAutoScroll(true)
             }
         }
 
@@ -208,7 +220,7 @@ Pane {
             width: 50
             height: 50
 
-            enabled: !DataServiceHub.autoScroll
+            enabled: !session.autoScroll
 
             onPressed: {
                 if (scrollDownAnimation.running) {

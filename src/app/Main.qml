@@ -15,71 +15,9 @@ Window {
     minimumHeight: 600
     minimumWidth: 800
 
-    Item {
+    LogSessionView {
         id: mainItem
         anchors.fill: parent
-
-        TitleBar {
-            id: titleBar
-            anchors {
-                top: parent.top
-                left: parent.left
-                right: parent.right
-            }
-            height: 35
-        }
-
-        Rectangle {
-            anchors {
-                top:titleBar.bottom
-                bottom: bottomBar.top
-                left: parent.left
-                right: parent.right
-            }
-
-            Rectangle {
-                id: leftRect
-                anchors {
-                    left: parent.left
-                    top: parent.top
-                    bottom: parent.bottom
-                }
-                width: 10
-                color: "black"
-            }
-
-            Rectangle {
-                id: rightRect
-                anchors {
-                    right: parent.right
-                    top: parent.top
-                    bottom: parent.bottom
-                }
-                width: 10
-                color: "black"
-            }
-
-
-            LogsView {
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                    left: leftRect.right
-                    right: rightRect.left
-                }
-            }
-        }
-
-        BottomBar {
-            id: bottomBar
-            anchors {
-                bottom: parent.bottom
-                left: parent.left
-                right: parent.right
-            }
-
-            height: 40
-        }
     }
 
     Item {

@@ -4,6 +4,7 @@ project(data)
 
 set(QML_FILES
     DataServiceHub.qml
+    LogSession.qml
 )
 
 set_source_files_properties(DataServiceHub.qml PROPERTIES
@@ -20,6 +21,8 @@ set(CPP_FILES
     FpsItem.cpp
     FileIO.h
     FileIO.cpp
+    LogConfigModel.h
+    LogConfigModel.cpp
 )
 
 qt_add_qml_module(${PROJECT_NAME}

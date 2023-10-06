@@ -7,6 +7,11 @@
 #include <QFontDatabase>
 #include <QDebug>
 
+#ifdef _WIN32
+#include <Windows.h>
+#include <ShlObj.h>
+#endif
+
 
 void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -84,6 +89,18 @@ void loadFonts() {
     }
 }
 
+QString getAppDataDir() {
+#ifdef _WIN32
+    char path[MAX_PATH];
+    if (SUCCEEDED(SHGetFolderPathA(nullptr, CSIDL_LOCAL_APPDATA, nullptr, 0, path))) {
+        return QString(path) + "\\" + APP_NAME;
+    }
+    qWarning() << "Failed to get app's data dir";
+    return "";
+#endif
+    return "";
+}
+
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
@@ -102,6 +119,11 @@ int main(int argc, char *argv[])
 
     engine.rootContext()->setContextProperty("BuildDate", BUILD_DATE);
     engine.rootContext()->setContextProperty("BuildTime", BUILD_TIME);
+
+    // Get app data dir
+    QString appDataDir = getAppDataDir();
+    qApp->setProperty("AppDataDir", appDataDir);
+    engine.rootContext()->setContextProperty("AppDataDir", appDataDir);
 
     QUrl url = QUrl(QStringLiteral("qrc:/qt/qml/Main/Main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app,

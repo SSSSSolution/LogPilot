@@ -6,7 +6,10 @@ import src.modules.data 1.0
 import src.modules.components 1.0
 
 Rectangle {
+    id: r
     color: "black"
+
+    property var session: undefined
 
     function convertStrToNumber(str) {
         var num = parseInt(str);
@@ -34,7 +37,7 @@ Rectangle {
             fileMode: FileDialog.OpenFile
             onAccepted: {
                 console.log("choose log file: " + fileDialog.currentFile)
-                DataServiceHub.setLogFile(fileDialog.currentFile);
+                session.setLogFile(fileDialog.currentFile)
             }
         }
     }
@@ -48,7 +51,7 @@ Rectangle {
             verticalCenter: parent.verticalCenter
         }
         height: contentHeight
-        text: DataServiceHub.curLogFile
+        text: (session == null) ? "" : session.logPath
         elide: Text.ElideMiddle
         horizontalAlignment: Text.AlignLeft
     }
@@ -63,10 +66,10 @@ Rectangle {
         height: 18
 
         Keys.onReturnPressed: {
-            DataServiceHub.setClipLine(convertStrToNumber(textInput.text))
+            session.setClipLine(convertStrToNumber(textInput.text))
         }
 
-        enabled: DataServiceHub.logLoaded
+        enabled: (session == null) ? false : session.loaded
     }
 
     ClipButton {
@@ -80,10 +83,10 @@ Rectangle {
         height: 20
 
         onClicked: {
-            DataServiceHub.setClipLine(convertStrToNumber(clipTextInput.textInput.text))
+            session.setClipLine(convertStrToNumber(clipTextInput.textInput.text))
         }
 
-        enabled: DataServiceHub.logLoaded
+        enabled: (session == null) ? false : session.loaded
     }
 
     DefaultTextButton {
@@ -98,8 +101,6 @@ Rectangle {
         textItem.font.pointSize: 9
         width: 42
         height: 16
-
-        enabled: DataServiceHub.curLogFile !== ""
 
         onClicked: {
             if (aboutViewLoader.item == null) {

@@ -7,174 +7,84 @@ Item {
     id: hub
     property string name: "Singleton"
 
-    property bool autoScroll: false
-    function setAutoScroll(isAuto) {
-        autoScroll = isAuto;
-    }
-
-    property bool logLoaded: false
-
     // View
     property bool mainWindowNeedBlur: false
+
+    // session
+    function createSession(sessionName) {
+        for (var i = 0; i < p.sessions.length; i++) {
+            if (p.sessions[i].name === sessionName) {
+                console.error("createSession: session with the name '" +
+                              sessionName + "' already exist.")
+                return
+            }
+        }
+
+        var sessionComponent = Qt.createComponent("LogSession.qml");
+        if (sessionComponent.status === Component.Ready) {
+            var session = sessionComponent.createObject(hub);
+            if (session) {
+                session.name = sessionName;
+                p.sessions.push(session);
+            } else {
+                console.error("Failed to create session object.");
+            }
+        } else if (sessionComponent.status === Component.Error) {
+            console.error("Error loading session component:", sessionComponent.errorString());
+        }
+    }
+
+    function removeSession(sessionName) {
+        for (var i = 0; i < p.sessions.length; i++) {
+            if (p.sessions[i].name === sessionName) {
+                p.sessions[i].destroy()
+                p.sessions.splice(i, 1)
+                return
+            }
+        }
+        console.warn("RemoveSession: session with the name '" +
+                     sessionName + "' not found.")
+    }
+
+    function getSession(sessionName) {
+        for (var i = 0; i < p.sessions.length; i++) {
+            if (p.sessions[i].name === sessionName) {
+                return p.sessions[i]
+            }
+        }
+        return null
+    }
+
     // config
-    readonly property string defaultConfigPath: ":/configs/LogPilotConfig.json"
-    property string userConfigPath: ""
-    property var curConfig: undefined
+    property var defaultConfig: undefined
+    readonly property alias configs: p.configs
 
-    // Log file
-    property string curLogFile: ""
-
-    function extractFilePath(url) {
-        var urlString = url.toString();
-        var filePrefix = "file:///";
-        if (urlString.indexOf(filePrefix) === 0) {
-            return urlString.substring(filePrefix.length)
-        }
-        return urlString
+    function createConfig(name) {
+        // check
+        return true
     }
 
-    function urlsAreEqual(url1, url2) {
-        var absPath1 = extractFilePath(url1)
-        var absPath2 = extractFilePath(url2)
-        return absPath1 === absPath2
+    function addConfig(path) {
+
     }
 
-    function setLogFile(logFile) {
-        if (urlsAreEqual(logFile, curLogFile)) {
-            return;
-        }
+    function removeConfig(name) {
 
-        curLogFile = extractFilePath(logFile)
-        logLevel = 1
-        filter = ""
-        clipLine = 0;
-        autoScroll = true;
-
-        stopWatch();
-        restartTimer.start();
     }
 
-    // Log Level
-    property var logRegexMap: null
-    property int logLevel: 1 // 0 ~ 6
-    function setLogLevel(level) {
-        if (isNaN(level)) {
-            console.warn("Input log level ", level , " is not a number.");
-        } else if (level < 0 || level > 6){
-            console.warn("Invalid log level: ", level);
-            return;
-        }
+    function getConfig(name) {
 
-        if (level === logLevel)
-            return;
-
-        logLevel = level;
-        stopWatch();
-        restartTimer.start();
     }
 
-    // filter
-    property string filter: ""
-    property var filterRegExp: new RegExp("")
-    function setFilter(text) {
-        if (text === filter) {
-            return;
-        }
-        filter = text;
-        DataServiceHub.stopWatch();
-        restartTimer.start()
+    // log configs
+    property LogConfigModel logConfigModel: LogConfigModel {
+        id: logConfigModel
     }
 
-    // clip line
-    property int clipLine: 0
-    function setClipLine(line) {
-        if (clipLine < 0) {
-            return
-        }
-        if (line === clipLine) {
-            return
-        }
-
-        clipLine = line
-        DataServiceHub.stopWatch();
-        restartTimer.start()
-    }
-
-    // start timer
-    Timer {
-        id: restartTimer
-        interval: 0
-        running: false
-        triggeredOnStart:  false
-        repeat: false
-
-        onTriggered: {
-            // reset filter regex
-            var regexStr = filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            filterRegExp = new RegExp(regexStr, 'gi')
-
-            hub.startWatch()
-            hub.setAutoScroll(true);
-        }
-    }
-
-    signal started()
-
-    Component {
-        id: startCallback
-        StartCallableObject {
-            onSuccessed: {
-                console.log("start success");
-                logLoaded = true
-                DataServiceHub.loadFrontBlock()
-            }
-            onFailed: {
-            }
-        }
-    }
-
-    function startWatch() {
-        var startCbObj = startCallback.createObject()
-        logWatcherService.startWork(curLogFile, startCbObj, filter, logLevel, logRegexMap, clipLine);
-    }
-
-    function stopWatch() {
-        logWatcherService.stopWork();
-        logLoaded = false
-    }
-
-    property bool frontBlockLoading: false
-    property LoadFrontBlockCallableObject loadFrontBlockCbObj: null
-
-    Component {
-        id: loadFrontBlockCallback
-        LoadFrontBlockCallableObject {
-            onSuccessed: {
-                DataServiceHub.loadFrontBlock()
-            }
-            onFailed: {
-                console.log("load front stopped");
-                loadedFrontBlockFailed()
-            }
-        }
-    }
-
-    signal loadedFrontBlock(int logsCount)
-    signal loadedFrontBlockFailed()
-
-    function loadFrontBlock() {
-        var cbObj = loadFrontBlockCallback.createObject();
-        if (cbObj !== null) {
-            loadFrontBlockCbObj = cbObj;
-            logWatcherService.loadFrontBlock(loadFrontBlockCbObj)
-        } else {
-            console.log("load front stopped due to null obj");
-            loadedFrontBlockFailed();
-        }
-    }
-
-    property LogWatcherService logWatcherService: LogWatcherService {
-        id: logWatcherService
+    QtObject {
+        id: p
+        property var sessions: []
+        property var configs: []
     }
 
     FileIO {
@@ -182,24 +92,38 @@ Item {
     }
 
     Component.onCompleted: {
+        // load config
         try {
-            curConfig = JSON.parse(fileIO.read(defaultConfigPath))
+            defaultConfig = JSON.parse(fileIO.read(":/configs/LogPilotConfig.json"))
+            defaultConfig.name = "build-in"
         } catch (error) {
-            console.log("Load default config failed: ", error.message)
+            console.error("Load default config failed: ", error.message)
+        }
+
+        if (defaultConfig == null) {
+            console.error("Failed to load default config")
             Qt.exit(-1)
         }
-    }
 
-    onCurConfigChanged: {
-        if (!(curConfig == null)) {
-            logRegexMap = {
-                "trace" : curConfig.levels.trace.regex,
-                "debug" : curConfig.levels.debug.regex,
-                "info" : curConfig.levels.info.regex,
-                "warn" : curConfig.levels.warn.regex,
-                "error" : curConfig.levels.error.regex,
-                "fatal" : curConfig.levels.fatal.regex,
-            }
-        }
+        p.configs.push(defaultConfig)
+        var cfg1 = {};
+        cfg1.name = "test confg 1"
+        var cfg2 = {};
+        cfg2.name = "test confg 2"
+        var cfg3 = {};
+        cfg3.name = "test confg 3"
+        p.configs.push(cfg1)
+        p.configs.push(cfg2)
+        p.configs.push(cfg3)
+        p.configs.push(cfg1)
+        p.configs.push(cfg2)
+        p.configs.push(cfg3)
+        p.configs.push(cfg1)
+        p.configs.push(cfg2)
+        p.configs.push(cfg3)
+        p.configs.push(cfg1)
+        p.configs.push(cfg2)
+        p.configs.push(cfg3)
     }
 }
+

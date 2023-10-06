@@ -7,9 +7,12 @@ Rectangle {
     id: r
     color: "black"
 
-    property var levelsConfig: DataServiceHub.curConfig.levels
+    property var session: undefined
+    property var levelsConfig: (session == null || session.config == null) ? undefined : session.config.levels
 
     onLevelsConfigChanged: {
+        if (levelsConfig == null)
+            return
         // Reset level Model
         const levels = ["fatal", "error", "warn", "info", "debug", "trace", "none"];
         for (let level of levels) {
@@ -29,9 +32,9 @@ Rectangle {
 
         fontPointSize: 9
 
-        enabled: DataServiceHub.logLoaded
+        enabled: (session == null) ? false : session.loaded
 
-        currentIndex: 6 - DataServiceHub.logLevel
+        currentIndex: (session == null) ? 6 : 6 - session.logLevel
 
         model: ListModel {
             id: levelModel
@@ -39,19 +42,19 @@ Rectangle {
 
         onCurrentTextChanged: {
             if (currentText === "FATAL") {
-                DataServiceHub.setLogLevel(6);
+                session.setLogLevel(6);
             } else if (currentText === "ERROR") {
-                DataServiceHub.setLogLevel(5);
+                session.setLogLevel(5);
             } else if (currentText === "WARN") {
-                DataServiceHub.setLogLevel(4);
+                session.setLogLevel(4);
             } else if (currentText === "INFO") {
-                DataServiceHub.setLogLevel(3);
+                session.setLogLevel(3);
             } else if (currentText === "DEBUG") {
-                DataServiceHub.setLogLevel(2);
+                session.setLogLevel(2);
             } else if (currentText === "TRACE") {
-                DataServiceHub.setLogLevel(1);
+                session.setLogLevel(1);
             } else if (currentText === "NONE") {
-                DataServiceHub.setLogLevel(0);
+                session.setLogLevel(0);
             } else {
                 console.error("Unknow level: ", currentText)
             }
@@ -70,15 +73,15 @@ Rectangle {
 
         textInput.onTextChanged: {
             if (textInput.text === "") {
-                DataServiceHub.setFilter(textInput.text);
+                session.setFilter(textInput.text);
             }
         }
 
         Keys.onReturnPressed: {
-            DataServiceHub.setFilter(textInput.text);
+            session.setFilter(textInput.text);
         }
 
-        enabled: DataServiceHub.logLoaded
+        enabled: (session == null) ? false : session.loaded
     }
 
     SearchButton {
@@ -95,7 +98,7 @@ Rectangle {
             DataServiceHub.setFilter(searchTextInput.textInput.text);
         }
 
-        enabled: DataServiceHub.logLoaded
+        enabled: (session == null) ? false : session.loaded
     }
 
     DefaultIconButton {
