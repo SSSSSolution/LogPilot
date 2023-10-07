@@ -11,6 +11,7 @@ Rectangle {
         color: "#9B9B9B"
         width: 1
     }
+    radius: 10
 
     ColorGradientPanel {
         id: colorGradientPanel
@@ -18,10 +19,10 @@ Rectangle {
             top: parent.top
             topMargin: 15
             right: parent.right
-            rightMargin: 50
+            rightMargin: 15
         }
-        width: 165
-        height: 165
+        width: 250
+        height: 250
 
         huePosition: hueSlider.huePosition
     }
@@ -30,10 +31,11 @@ Rectangle {
         id: hueSlider
         anchors {
             top: colorGradientPanel.bottom
-            topMargin: 15
-            horizontalCenter: colorGradientPanel.horizontalCenter
+            topMargin: 20
+            left: colorGradientPanel.left
+            right: colorGradientPanel.right
         }
-        width: 240
+        width: 250
         height: 6
     }
 
@@ -49,31 +51,13 @@ Rectangle {
         spacing: 8
 
 
-        Row {
+        TextInputWithLabel {
+            id: noneInput
             height: 20
             width: 120
 
-            Text {
-                width: 50
-                text: "None"
-                height: contentHeight
-
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                font.pixelSize: 12
-                font.bold: true
-                color: "white"
-            }
-
-            Rectangle {
-                width: 70
-                height: 18
-                color: "#D9D9D9"
-                TextInput {
-                    anchors.fill: parent
-                }
-            }
+            labelItem.width: 50
+            labelItem.text: "None"
         }
 
         Row {

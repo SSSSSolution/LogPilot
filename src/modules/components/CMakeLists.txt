@@ -15,6 +15,7 @@ set(QML_FILES
     SettingTabBar.qml
     HueSlider.qml
     ColorGradientPanel.qml
+    TextInputWithLabel.qml
 )
 
 qt_add_qml_module(${PROJECT_NAME}

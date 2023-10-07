@@ -42,6 +42,7 @@ Popup {
                 anchors {
                     top: parent.top
                     left: parent.left
+                    leftMargin: 15
                 }
                 height: 25
             }
@@ -52,8 +53,8 @@ Popup {
                     top: tabBar.bottom
                     left: parent.left
                 }
-                height: 215
-                width: 408
+                height: 310
+                width: 570
 
                 currentIndex: tabBar.currentIndex
 
@@ -63,218 +64,6 @@ Popup {
 
                 RegexSettingView {
 
-                }
-
-                FontSettingView {
-
-                }
-            }
-
-            Pane {
-                id: configListPane
-                anchors {
-                    top: tabViews.top
-                    left: tabViews.right
-                    right: parent.right
-                    leftMargin: 5
-                }
-                height: 317
-
-                background: Rectangle {
-                    color: "#5A5A5A"
-                    border {
-                        width: 1
-                        color: "#9B9B9B"
-                    }
-                }
-
-                contentItem: Item {
-                    anchors.fill: parent
-                    anchors.margins: 5
-                    ListView {
-                        id: configList
-                        anchors {
-                            top: parent.top
-                            left: parent.left
-                            right: parent.right
-                            bottom: newCfgBtn.top
-                            bottomMargin: 10
-                        }
-
-                        model: DataServiceHub.logConfigModel
-
-                        spacing: 2
-                        clip: true
-
-                        delegate: Pane {
-                            id: configItemPane
-                            background: Rectangle {
-                                anchors.fill: parent
-                                color: configList.currentIndex === index ? "#6E6F6E" : "transparent"
-                            }
-                            width: configList.width
-                            height: 20
-                            padding: 0
-
-                            contentItem: Text {
-                                anchors.centerIn: parent.Center
-                                width: parent.width
-                                height: parent.height
-                                text: model.name
-                                font.bold: true
-                                font.pixelSize: 15
-                                horizontalAlignment: Text.AlignLeft
-                                verticalAlignment: Text.AlignVCenter
-                                color: {
-                                    var color = "#D4D4D4"
-                                    if (model.name === DataServiceHub.defaultConfig.name) {
-                                        color = "#E48832"
-                                    }
-
-                                    if (configItemPane.hovered) {
-                                        color = Qt.lighter(color, 1.5)
-                                    }
-
-                                    return color
-                                }
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        configList.currentIndex = index
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    DefaultTextButton {
-                        id: newCfgBtn
-                        anchors {
-                            bottom: parent.bottom
-                            horizontalCenter: parent.horizontalCenter
-                            bottomMargin: 5
-                        }
-                        width: 110
-                        height: 24
-
-                        backgroundItem.color: "#1F1F1F"
-                        backgroundItem.border.color: "#9B9B9B"
-                        backgroundItem.border.width: 1
-                        backgroundItem.radius: 3
-                        color: "#D4D4D4"
-                        textItem.text: "New Config"
-                        textItem.font.pixelSize: 16
-
-                        onClicked: {
-                            if (newCfgPopupLoader.item == null) {
-                                newCfgPopupLoader.sourceComponent = newCfgPopupComponent
-                            }
-                        }
-                    }
-                }
-            }
-
-            Rectangle {
-                id: placeHodler2
-                anchors {
-                    top: tabViews.bottom
-                    topMargin: 5
-                    bottom: configListPane.bottom
-                    left: tabViews.left
-                    right: tabViews.right
-                }
-
-                Image {
-                    anchors.margins: 1
-                    anchors.fill: parent
-                    source: "qrc:/images/bg.png"
-                    fillMode: Image.Stretch
-                }
-
-                border {
-                    width: 1
-                    color: "#9B9B9B"
-                }
-            }
-
-            DefaultTextButton {
-                id: deleteBtn
-                anchors {
-                    top: placeHodler2.bottom
-                    topMargin: 8
-                    left: placeHodler2.left
-                    leftMargin: 10
-                }
-                width: 75
-                height: 24
-
-                backgroundItem.color: "#1F1F1F"
-                backgroundItem.border.color: "#9B9B9B"
-                backgroundItem.border.width: 1
-                backgroundItem.radius: 3
-                color: "#D4D4D4"
-                textItem.text: "Delete"
-                textItem.font.pixelSize: 16
-            }
-
-            DefaultTextButton {
-                id: saveBtn
-                anchors {
-                    verticalCenter: deleteBtn.verticalCenter
-                    right: placeHodler2.right
-                    rightMargin: 10
-                }
-                width: 75
-                height: 24
-
-                backgroundItem.color: "#1F1F1F"
-                backgroundItem.border.color: "#9B9B9B"
-                backgroundItem.border.width: 1
-                backgroundItem.radius: 3
-                color: "#D4D4D4"
-                textItem.text: "Save"
-                textItem.font.pixelSize: 16
-            }
-
-            DefaultTextButton {
-                id: saveAsBtn
-                anchors {
-                    verticalCenter: deleteBtn.verticalCenter
-                    right: saveBtn.left
-                    rightMargin: 20
-                }
-                width: 100
-                height: 24
-
-                backgroundItem.color: "#1F1F1F"
-                backgroundItem.border.color: "#9B9B9B"
-                backgroundItem.border.width: 1
-                backgroundItem.radius: 3
-                color: "#D4D4D4"
-                textItem.text: "Save as"
-                textItem.font.pixelSize: 16
-            }
-
-            DefaultTextButton {
-                id: closeBtn
-                anchors {
-                    verticalCenter: deleteBtn.verticalCenter
-                    horizontalCenter: configListPane.horizontalCenter
-                }
-                width: 75
-                height: 24
-
-                backgroundItem.color: "#1F1F1F"
-                backgroundItem.border.color: "#9B9B9B"
-                backgroundItem.border.width: 1
-                backgroundItem.radius: 3
-                color: "#D4D4D4"
-                textItem.text: "Close"
-                textItem.font.pixelSize: 16
-
-                onClicked: {
-                    close()
                 }
             }
         }
@@ -297,7 +86,7 @@ Popup {
     }
 
     Component.onCompleted: {
-        var labels = [{label: "Color"}, {label: "Regex"}, {label: "Font"}];
+        var labels = [{label: "Color"}, {label: "Regex"}];
         for (var i = 0; i < labels.length; i++) {
             tabBar.repeater.model.append(labels[i]);
         }
