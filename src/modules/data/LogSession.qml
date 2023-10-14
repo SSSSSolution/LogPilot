@@ -28,7 +28,7 @@ Item {
     property var logModel: logWatcherService.logData
 
     // config
-    property var config: DataServiceHub.defaultConfig
+    property var config: DataServiceHub.config.value
 
     // view
     property bool autoScroll: true
@@ -165,7 +165,6 @@ Item {
             }
         }
     }
-
 
 
     onConfigChanged: {

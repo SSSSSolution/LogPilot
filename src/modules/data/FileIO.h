@@ -2,8 +2,6 @@
 #define FILE_IO_H
 
 #include <QObject>
-#include <QFile>
-#include <QTextStream>
 #include <QQmlEngine>
 
 class FileIO : public QObject {

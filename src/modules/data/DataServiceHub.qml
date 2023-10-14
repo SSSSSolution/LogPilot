@@ -56,35 +56,13 @@ Item {
     }
 
     // config
-    property var defaultConfig: undefined
-    readonly property alias configs: p.configs
-
-    function createConfig(name) {
-        // check
-        return true
-    }
-
-    function addConfig(path) {
-
-    }
-
-    function removeConfig(name) {
-
-    }
-
-    function getConfig(name) {
-
-    }
-
-    // log configs
-    property LogConfigModel logConfigModel: LogConfigModel {
-        id: logConfigModel
+    property Config config: Config {
+        id: config
     }
 
     QtObject {
         id: p
         property var sessions: []
-        property var configs: []
     }
 
     FileIO {
@@ -92,38 +70,6 @@ Item {
     }
 
     Component.onCompleted: {
-        // load config
-        try {
-            defaultConfig = JSON.parse(fileIO.read(":/configs/LogPilotConfig.json"))
-            defaultConfig.name = "build-in"
-        } catch (error) {
-            console.error("Load default config failed: ", error.message)
-        }
-
-        if (defaultConfig == null) {
-            console.error("Failed to load default config")
-            Qt.exit(-1)
-        }
-
-        p.configs.push(defaultConfig)
-        var cfg1 = {};
-        cfg1.name = "test confg 1"
-        var cfg2 = {};
-        cfg2.name = "test confg 2"
-        var cfg3 = {};
-        cfg3.name = "test confg 3"
-        p.configs.push(cfg1)
-        p.configs.push(cfg2)
-        p.configs.push(cfg3)
-        p.configs.push(cfg1)
-        p.configs.push(cfg2)
-        p.configs.push(cfg3)
-        p.configs.push(cfg1)
-        p.configs.push(cfg2)
-        p.configs.push(cfg3)
-        p.configs.push(cfg1)
-        p.configs.push(cfg2)
-        p.configs.push(cfg3)
     }
 }
 

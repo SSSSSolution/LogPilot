@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QThread>
 #include <QFontDatabase>
+#include <QDir>
 #include <QDebug>
 
 #ifdef _WIN32
@@ -101,14 +102,70 @@ QString getAppDataDir() {
     return "";
 }
 
+QString g_appDataDir;
+QString g_configDir;
+QString g_logDir;
+
+bool ensureDirectoryExists(const QString &path) {
+    QDir dir(path);
+    if (!dir.exists()) {
+        if (!dir.mkpath(".")) {
+            qCritical() << "Failed to create dir: " << path;
+            return false;
+        }
+    }
+    return true;
+}
+
+void initAppDataDir() {
+    g_appDataDir = QDir(QCoreApplication::applicationDirPath()).filePath("../AppData");
+    if (!ensureDirectoryExists(g_appDataDir)) {
+        qCritical() << "Failed to create data dir: " << g_appDataDir;
+        qCritical() << "The App will only use default settings and will not save any data.";
+        g_appDataDir = "";
+        return;
+    }
+
+    g_configDir = QDir(g_appDataDir).filePath("config");
+    if (!ensureDirectoryExists(g_configDir)) {
+        qCritical() << "Failed to create config dir: " << g_logDir;
+        g_configDir = "";
+    }
+
+    g_logDir = QDir(g_appDataDir).filePath("log");
+    if (!ensureDirectoryExists(g_logDir)) {
+        qCritical() << "Failed to create log dir: " << g_logDir;
+        g_logDir = "";
+    }
+}
+
+void registerGlobalVariableToQmlEngine(QQmlApplicationEngine &engine) {
+    engine.rootContext()->setContextProperty("BuildDate", BUILD_DATE);
+    engine.rootContext()->setContextProperty("BuildTime", BUILD_TIME);
+    qInfo() << "App BUILD Time is: " << BUILD_DATE + QString("-") + BUILD_TIME;
+
+
+    engine.rootContext()->setContextProperty("AppDataDir", g_appDataDir);
+    engine.rootContext()->setContextProperty("AppConfigDir", g_configDir);
+    engine.rootContext()->setContextProperty("AppLogDir", g_logDir);
+
+    qInfo() << "App data dir is: " << g_appDataDir;
+    qInfo() << "App config dir is: " << g_configDir;
+    qInfo() << "App log dir is: " << g_logDir;
+}
+
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    qInstallMessageHandler(myMessageHandler);
-
     app.setApplicationName(APP_NAME);
     app.setApplicationVersion(GIT_HASH);
+    qInfo() << "App name: " << APP_NAME;
+    qInfo() << "App version: " << GIT_HASH;
+
+    initAppDataDir();
+
+    qInstallMessageHandler(myMessageHandler);
 
     loadFonts();
 
@@ -117,13 +174,11 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     qDebug() << engine.importPathList();
 
-    engine.rootContext()->setContextProperty("BuildDate", BUILD_DATE);
-    engine.rootContext()->setContextProperty("BuildTime", BUILD_TIME);
+    registerGlobalVariableToQmlEngine(engine);
 
     // Get app data dir
     QString appDataDir = getAppDataDir();
     qApp->setProperty("AppDataDir", appDataDir);
-    engine.rootContext()->setContextProperty("AppDataDir", appDataDir);
 
     QUrl url = QUrl(QStringLiteral("qrc:/qt/qml/Main/Main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app,
