@@ -16,6 +16,11 @@ Rectangle {
         return Qt.hsva(r.huePosition, saturation, value, 1)
     }
 
+    function setSelectionIndicator(x, y) {
+        selectionIndicator.x = x - selectionIndicator.width / 2
+        selectionIndicator.y = y - selectionIndicator.height / 2
+    }
+
     border {
         color: "#9B9B9B"
         width: 1

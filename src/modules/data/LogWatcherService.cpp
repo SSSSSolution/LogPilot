@@ -72,6 +72,12 @@ QAbstractItemModel *LogWatcherService::logData() {
     return m_curModel;
 }
 
+bool LogWatcherService::testRegexMatch(const QString &str, const QString &regex) {
+    QRegularExpression re(regex, QRegularExpression::CaseInsensitiveOption);
+    QRegularExpressionMatch match = re.match(str);
+    return match.hasMatch();
+}
+
 void LogWatcherService::onCurLineChanged(int curLine) {
     qDebug() << "not impl onCurLineChanged()";
 }

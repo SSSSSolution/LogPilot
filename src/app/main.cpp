@@ -118,7 +118,7 @@ bool ensureDirectoryExists(const QString &path) {
 }
 
 void initAppDataDir() {
-    g_appDataDir = QDir(QCoreApplication::applicationDirPath()).filePath("../AppData");
+    g_appDataDir = QDir(QCoreApplication::applicationDirPath()).filePath("AppData");
     if (!ensureDirectoryExists(g_appDataDir)) {
         qCritical() << "Failed to create data dir: " << g_appDataDir;
         qCritical() << "The App will only use default settings and will not save any data.";

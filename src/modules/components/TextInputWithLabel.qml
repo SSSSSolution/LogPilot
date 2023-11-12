@@ -4,6 +4,8 @@ import QtQuick.Controls.Basic
 Pane {
     id: c
 
+    property bool inputValid: true
+
     property alias labelItem: labelItem
     property alias textInputItem: textInputItem
 
@@ -39,8 +41,22 @@ Pane {
 
             background: Rectangle {
                 id: textInputBg
-                color: "#B0B0B0"
+                color: "#2C2C2C"
+                radius: 3
+                border {
+                    width: 1
+                    color: {
+                        if (!c.inputValid) {
+                            return "#D34646"
+                        }
+                        if (c.focus) {
+                            return "#FFC83A"
+                        }
+                        return "#756E6E"
+                    }
+                }
             }
+            focusPolicy: Qt.TabFocus
 
             contentItem: TextInput {
                 id: textInputItem

@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.16)
 project(components)
 
 set(QML_FILES
+    DefaultButton.qml
+    AccentButton.qml
+    PositiveButton.qml
+    NegativeButton.qml
     DefaultIconButton.qml
     OpenFileButton.qml
     ClipButton.qml

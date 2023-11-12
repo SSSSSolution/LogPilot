@@ -18,6 +18,8 @@ qt_add_resources(${PROJECT_NAME} "assets"
         ../../assets/icons/setting.svg
         ../../assets/icons/down-arrow.svg
         ../../assets/icons/scroll-down.svg
+        ../../assets/icons/check-mark.svg
+        ../../assets/icons/cross-mark.svg
         ../../assets/fonts/Sansation-Regular.ttf
         ../../assets/fonts/JosefinSlab-Regular.ttf
         ../../assets/fonts/JosefinSlab-Bold.ttf

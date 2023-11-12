@@ -14,7 +14,7 @@ Item {
     // log view params
     property string logPath: ""
 
-    property int logLevel: 1 // 0 - 6
+    property int logLevel: 0 // 0 - 6
 
     property var logRegexMap: undefined
 
@@ -31,6 +31,7 @@ Item {
     property var config: DataServiceHub.config.value
 
     // view
+    property bool enableAutoScroll: true
     property bool autoScroll: true
 
 
@@ -140,6 +141,10 @@ Item {
         logWatcherService.loadFrontBlock(p.loadFrontCbHolder)
     }
 
+    Component.onCompleted: {
+        applyConfig()
+    }
+
     Component.onDestruction: {
         console.info("Session with name '" + name + "' has been destroyed.")
     }
@@ -162,20 +167,6 @@ Item {
 
             onTriggered: {
                 r.startWatch()
-            }
-        }
-    }
-
-
-    onConfigChanged: {
-        if (!(config == null)) {
-            logRegexMap = {
-                "trace" : config.levels.trace.regex,
-                "debug" : config.levels.debug.regex,
-                "info" : config.levels.info.regex,
-                "warn" : config.levels.warn.regex,
-                "error" : config.levels.error.regex,
-                "fatal" : config.levels.fatal.regex,
             }
         }
     }
@@ -203,6 +194,29 @@ Item {
             onFailed: {
 
             }
+        }
+    }
+
+    function applyConfig() {
+        config =  DataServiceHub.config.value
+        if (config == null)
+            return
+
+        logRegexMap = {
+            "trace" : config.levels.trace.regex,
+            "debug" : config.levels.debug.regex,
+            "info" : config.levels.info.regex,
+            "warn" : config.levels.warn.regex,
+            "error" : config.levels.error.regex,
+            "fatal" : config.levels.fatal.regex,
+        }
+    }
+
+    Connections {
+        target: DataServiceHub.config
+
+        function onConfigChanged() {
+            applyConfig()
         }
     }
 }

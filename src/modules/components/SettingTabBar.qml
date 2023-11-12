@@ -23,6 +23,7 @@ TabBar {
 
         delegate: TabButton {
             id: btn
+            focusPolicy: Qt.NoFocus
 
             contentItem: Text {
                 text: model.label

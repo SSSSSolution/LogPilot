@@ -5,27 +5,33 @@
         },
         "trace": {
             "color": "#FFFFFF",
-            "regex": "\\[trace"
+            "regex": "\\[trace",
+            "matchTest": "[trace] trace log message"
         },
         "debug": {
             "color": "#faaa0a",
-            "regex": "\\[debug"
+            "regex": "\\[debug",
+            "matchTest": "[debug] trace log message"
         },
         "info": {
             "color": "#48BB31",
-            "regex": "\\[info"
+            "regex": "\\[info",
+            "matchTest": "[info] trace log message"
         },
         "warn": {
             "color": "#0070BB",
-            "regex": "\\[warn"
+            "regex": "\\[warn",
+            "matchTest": "[warn] trace log message"
         },
         "error": {
             "color": "#FF6B68",
-            "regex": "\\[error"
+            "regex": "\\[error",
+            "matchTest": "[error] trace log message"
         },
         "fatal": {
             "color": "#FF0006",
-            "regex": "\\[fatal"
+            "regex": "\\[fatal",
+            "matchTest": "[fatal] trace log message"
         }
     }
 }

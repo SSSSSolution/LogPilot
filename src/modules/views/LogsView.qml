@@ -6,14 +6,54 @@ import src.modules.data 1.0
 import src.modules.components 1.0
 
 Pane {
-    background: Image {
-        source: "qrc:/images/bg.png"
-        fillMode: Image.Stretch
+    property alias bgRect: bgRect
+
+    background: Rectangle {
+        id: bgRect
+        border.width: 0
+        color: "transparent"
+        Image {
+            anchors.fill: parent
+            anchors.margins: parent.border.width
+            source: "qrc:/images/bg.png"
+            fillMode: Image.Stretch
+        }
     }
 
     padding: 0
 
     property var session: undefined
+
+    onSessionChanged: {
+        if (session == null)
+            return
+        noneColor = session.config.levels.none.color
+        traceColor = session.config.levels.trace.color
+        debugColor = session.config.levels.debug.color
+        infoColor = session.config.levels.info.color
+        warnColor = session.config.levels.warn.color
+        errorColor = session.config.levels.error.color
+        fatalColor = session.config.levels.fatal.color
+
+        session.onConfigChanged.connect(function(){
+            noneColor = session.config.levels.none.color
+            traceColor = session.config.levels.trace.color
+            debugColor = session.config.levels.debug.color
+            infoColor = session.config.levels.info.color
+            warnColor = session.config.levels.warn.color
+            errorColor = session.config.levels.error.color
+            fatalColor = session.config.levels.fatal.color
+        })
+    }
+
+    property string noneColor: "#FFFFFF"
+    property string traceColor: "#FFFFFF"
+    property string debugColor: "#FFFFFF"
+    property string infoColor: "#FFFFFF"
+    property string warnColor: "#FFFFFF"
+    property string errorColor: "#FFFFFF"
+    property string fatalColor: "#FFFFFF"
+
     property var levelsConfig: {
         if (session == null ||  session.config == null)
             return undefined
@@ -36,14 +76,14 @@ Pane {
         return resStr
     }
 
-//    AboutView {
-//        visible: DataServiceHub.curLogFile === ""
-//        anchors {
-//            horizontalCenter: parent.horizontalCenter
-//            top: parent.top
-//            topMargin: 100
-//        }
-//    }
+    AboutView {
+        visible: (session == null) || ((session.loaded === false) && (session.name !== "example"))
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            top: parent.top
+            topMargin: 100
+        }
+    }
 
     ListView {
         id: logView
@@ -54,6 +94,8 @@ Pane {
             right: parent.right
             left: parent.left
         }
+
+        keyNavigationEnabled: false
 
 //        FpsItem {
 //            id: fpsItem
@@ -104,7 +146,7 @@ Pane {
         property int count: 0
         Timer {
             id: autoScrollTimer
-            running: true
+            running: session.enableAutoScroll
             interval: 40
             triggeredOnStart: true
             repeat: true
@@ -118,7 +160,7 @@ Pane {
         ScrollBar.vertical:  DefaultScrollBar{
             id: scrollBar
             snapMode: ScrollBar.NoSnap
-            animationRunning: session.autoScroll
+            animationRunning: session.enableAutoScroll && session.autoScroll
 
             visible: logView.contentHeight > logView.height
 
@@ -153,31 +195,32 @@ Pane {
                 anchors.bottomMargin: 2
                 anchors.fill: parent
                 textFormat: TextEdit.RichText
-                text: "<p style='line-height: 120%;'>" + model.line + " " +
+                text: "<p style='line-height: 115%;'>" + model.line + " " +
                       "<font color='" + fontColor + "'>" + replaceFilterText(model.msg) + "</font>" + "</p>"
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
                 wrapMode: Text.WrapAnywhere
                 readOnly: true
+                activeFocusOnPress: false
 
                 font.family: sharedFont.family
-                font.pixelSize:16
+                font.pixelSize:15
 
                 property string fontColor: {
                     if (model.level === 0) {
-                        return levelsConfig.none.color
+                        return noneColor
                     } else if (model.level === 1) {
-                        return levelsConfig.trace.color
+                        return traceColor
                     } else if (model.level === 2) {
-                        return levelsConfig.debug.color
+                        return debugColor
                     } else if (model.level === 3) {
-                        return levelsConfig.info.color
+                        return infoColor
                     } else if (model.level === 4) {
-                        return levelsConfig.warn.color
+                        return warnColor
                     } else if (model.level === 5) {
-                        return levelsConfig.error.color
+                        return errorColor
                     } else if (model.level === 6) {
-                        return levelsConfig.fatal.color
+                        return fatalColor
                     } else {
                         return "#000000" // unknow
                     }
@@ -220,6 +263,7 @@ Pane {
             width: 50
             height: 50
 
+            visible: session.enableAutoScroll
             enabled: !session.autoScroll
 
             onPressed: {
@@ -236,5 +280,4 @@ Pane {
             property int pixelSize: 16
         }
     }
-
 }

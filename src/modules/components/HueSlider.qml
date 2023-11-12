@@ -11,6 +11,10 @@ Rectangle {
     property real huePosition: (draggableDot.x + draggableDot.width / 2) / width
     property color selectedColor: Qt.hsva(huePosition, 1.0, 1.0, 1.0)
 
+    function setHuePosition(huePos) {
+        draggableDot.x = (huePos * width) - draggableDot.width/2
+    }
+
     gradient: Gradient {
         orientation: Gradient.Horizontal
         GradientStop { position: 0.0; color: "#FF0000" }

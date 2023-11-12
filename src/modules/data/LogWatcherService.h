@@ -8,7 +8,7 @@
 #include <LogData.h>
 #include <WinExport.h>
 
-enum class DATA_API LogWatchStatus {
+enum class LogWatchStatus {
     Stopped,
     Running,
     Error,
@@ -71,6 +71,8 @@ public:
     Q_INVOKABLE void onPageItemCountChanged(int pageItemCount);
 
     Q_INVOKABLE QAbstractItemModel *logData();
+
+    Q_INVOKABLE bool testRegexMatch(const QString &str, const QString &regex);
 
 signals:
     void watchStarted();

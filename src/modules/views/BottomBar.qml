@@ -13,14 +13,18 @@ Rectangle {
     onLevelsConfigChanged: {
         if (levelsConfig == null)
             return
-        // Reset level Model
+        // Refresh level Model
+        let oldIdx = levelComboBox.currentIndex
+        levelModel.clear()
         const levels = ["fatal", "error", "warn", "info", "debug", "trace", "none"];
         for (let level of levels) {
             levelModel.append({level: level.toUpperCase(), color: levelsConfig[level].color});
         }
+        levelComboBox.currentIndex = oldIdx
     }
 
     LevelComboBox {
+        id: levelComboBox
         anchors {
             verticalCenter: parent.verticalCenter
             left: parent.left
@@ -55,8 +59,6 @@ Rectangle {
                 session.setLogLevel(1);
             } else if (currentText === "NONE") {
                 session.setLogLevel(0);
-            } else {
-                console.error("Unknow level: ", currentText)
             }
         }
     }

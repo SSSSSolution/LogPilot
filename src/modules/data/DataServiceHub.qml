@@ -60,9 +60,17 @@ Item {
         id: config
     }
 
+    function testRegexMatch(str, regexStr) {
+        return logWatcherService.testRegexMatch(str, regexStr)
+    }
+
     QtObject {
         id: p
         property var sessions: []
+    }
+
+    LogWatcherService {
+        id: logWatcherService
     }
 
     FileIO {
