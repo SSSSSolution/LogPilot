@@ -40,6 +40,7 @@ Item {
     signal startFailed()
 
     function startWatch() {
+        autoScroll = true
         p.startCbHolder = startCbComponent.createObject()
         logWatcherService.startWork(logPath, p.startCbHolder, filter, logLevel, logRegexMap, clipLine)
     }

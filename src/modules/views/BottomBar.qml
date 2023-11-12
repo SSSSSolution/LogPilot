@@ -97,7 +97,7 @@ Rectangle {
         height: 25
 
         onClicked: {
-            DataServiceHub.setFilter(searchTextInput.textInput.text);
+            session.setFilter(searchTextInput.textInput.text);
         }
 
         enabled: (session == null) ? false : session.loaded
