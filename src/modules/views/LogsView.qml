@@ -189,19 +189,41 @@ Pane {
             width: logView.width
             height: text.contentHeight
 
+            Text {
+                id: lineLabel
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: parent.left
+                    leftMargin: 2
+                }
+
+                text: "<p style='line-height: 115%;'>" + model.line  + " " + "</p>"
+                horizontalAlignment: Text.AlignLeft
+                verticalAlignment: Text.AlignTop
+                font.family: sharedFont.family
+                font.pixelSize:15
+                color: "grey"
+                textFormat: Text.RichText
+            }
+
             TextEdit {
                 id: text
-                anchors.leftMargin: 2
-                anchors.bottomMargin: 2
-                anchors.fill: parent
+                anchors {
+                    left: lineLabel.right
+                    leftMargin: 2
+                    right: parent.right
+                    top: parent.top
+                    bottom: parent.bottom
+                    bottomMargin: 2
+                }
                 textFormat: TextEdit.RichText
-                text: "<p style='line-height: 115%;'>" + model.line + " " +
+                text: "<p style='line-height: 115%;'>" +
                       "<font color='" + fontColor + "'>" + replaceFilterText(model.msg) + "</font>" + "</p>"
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
                 wrapMode: Text.WrapAnywhere
                 readOnly: true
-                activeFocusOnPress: false
 
                 font.family: sharedFont.family
                 font.pixelSize:15
